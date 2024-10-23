@@ -23,7 +23,7 @@ const Main = () => {
         <CommonAside collapsed={collapsed} />
         <Layout>
           <CommonHeader collapsed={collapsed} />
-          <CommonTag />
+        {/*  <CommonTag /> */}
           <Content
             style={{
               padding: 24,

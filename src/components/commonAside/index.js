@@ -2,7 +2,7 @@ import React from 'react'
 import { Menu, Layout } from 'antd'
 import * as Icon from "@ant-design/icons"
 import { useNavigate } from 'react-router-dom'
-import MenuConfig from '../../config'
+import MenuConfig from '../../config' // 定义侧边栏
 import { useDispatch } from "react-redux"
 import { selectMenuList } from '../../store/reducers/tab'
 
@@ -35,7 +35,7 @@ const CommonAside = ({ collapsed }) => {
   const setTabsList = (val) => {
     dispatch(selectMenuList(val))
   }
-  // 点击菜单
+  // 点击菜单(实现跳转)
   const selectMenu = (e) => {
     let data
     MenuConfig.forEach((item) => {
