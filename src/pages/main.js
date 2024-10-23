@@ -19,6 +19,7 @@ const Main = () => {
   return (
     <RouterAuth>
       <Layout className="main-container">
+        {/* 这里是侧边栏组件，collapsed 用于控制侧边栏的折叠状态 */} 
         <CommonAside collapsed={collapsed} />
         <Layout>
           <CommonHeader collapsed={collapsed} />

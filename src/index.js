@@ -7,6 +7,7 @@ import { Provider } from 'react-redux'
 import store from './store'
 import './api/mock'
 
+//StrictMode会导致组件重新渲染，如果有组件有在初始化时发送http请求的逻辑，就会请求两遍 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>

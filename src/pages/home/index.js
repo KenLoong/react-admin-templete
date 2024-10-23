@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Col, Row, Card, Table } from 'antd'
-import { getData } from '../../api'
+import { getData } from '../../api' // 引入http request func
 import "./home.css"
 import * as Icon from "@ant-design/icons";
 import MyEcharts from '../../components/Echarts'
@@ -67,7 +67,9 @@ const Home = () => {
   const userImg = require("../../assets/images/user.png")
   const [tableData, setTableData] = useState([])
   const [echartData, setEchartData] = useState({})
+  // useEffect是干嘛的？
   useEffect(() => {
+    // 这里发送http请求,getData是封装的http函数
     getData().then(({ data }) => {
       const { tableData, orderData, userData, videoData } = data.data
       setTableData(tableData)
@@ -81,36 +83,6 @@ const Home = () => {
           data: order.data.map(item => item[key]),
           type: 'line'
         })
-      })
-      setEchartData({
-        ...echartData,
-        order: {
-          xData,
-          series
-        },
-        user: {
-          xData: userData.map(item => item.date),
-          series: [
-            {
-              name: '新增用户',
-              data: userData.map(item => item.new),
-              type: 'bar'
-            },
-            {
-                name: '活跃用户',
-                data: userData.map(item => item.active),
-                type: 'bar'
-            }
-          ]
-        },
-        video: {
-          series: [
-            {
-              data: videoData,
-              type: 'pie'
-            }
-          ]
-        }
       })
     })
   }, [])
@@ -131,32 +103,9 @@ const Home = () => {
           </div>
         </Card>
         <Card style={{ marginTop: '20px' }} hoverable>
+          {/* 取消分页显示 */} 
           <Table rowKey={"name"} columns={columns} dataSource={tableData} pagination={false} />
         </Card>
-      </Col>
-      <Col style={{ marginTop: '20px' }} span={16}>
-        <div className="num">
-          {
-            countData.map((item, index) => {
-              return (
-                <Card key={index}>
-                    <div className="icon-box" style={{background: item.color}}>
-                      {iconToElement(item.icon)}
-                    </div>
-                    <div className="detail">
-                        <p className="num">￥{item.value}</p>
-                        <p className="txt">{item.name}</p>
-                    </div>
-                </Card>
-              )
-            })
-          }
-        </div>
-        { echartData.order && <MyEcharts chartData={echartData.order} style={{ height: '280px' }} /> }
-        <div className="graph">
-          { echartData.user && <MyEcharts chartData={echartData.user} style={{ width: '50%', height: '240px' }} /> }
-          { echartData.video && <MyEcharts chartData={echartData.video} isAxisChart={false} style={{ width: '50%', height: '260px' }} /> }
-        </div>
       </Col>
     </Row>
   )
