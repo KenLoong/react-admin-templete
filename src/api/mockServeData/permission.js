@@ -1,22 +1,152 @@
 import Mock from 'mockjs'
 
-// 生成模拟权限数据
-let List = []
-const count = 100
-
-for (let i = 0; i < count; i++) {
-  List.push(
-    Mock.mock({
-      id: Mock.Random.guid(),
-      name: Mock.Random.word(5, 10),
-      description: Mock.Random.sentence(10, 20),
-      type: Mock.Random.pick(['menu', 'action']),
-      url: Mock.Random.url(),
-      parent_id: i > 0 ? Mock.Random.integer(1, i) : null,
-      order_num: Mock.Random.integer(1, 100)
-    })
-  )
-}
+// Generate mock permission data
+let List = [
+  {
+    id: '1',
+    name: 'System Management',
+    description: 'Permissions related to system management',
+    type: 'menu',
+    url: '/system',
+    parent_id: null,
+    order_num: 1
+  },
+  {
+    id: '2',
+    name: 'User Management',
+    description: 'Permissions related to user management',
+    type: 'menu',
+    url: '/system/user',
+    parent_id: '1',
+    order_num: 1
+  },
+  {
+    id: '3',
+    name: 'Role Management',
+    description: 'Permissions related to role management',
+    type: 'menu',
+    url: '/system/role',
+    parent_id: '1',
+    order_num: 2
+  },
+  {
+    id: '4',
+    name: 'Permission Management',
+    description: 'Permissions related to permission management',
+    type: 'menu',
+    url: '/system/permission',
+    parent_id: '1',
+    order_num: 3
+  },
+  {
+    id: '5',
+    name: 'View Users',
+    description: 'Permission to view user list',
+    type: 'action',
+    url: '/api/users',
+    parent_id: '2',
+    order_num: 1
+  },
+  {
+    id: '6',
+    name: 'Create User',
+    description: 'Permission to create new user',
+    type: 'action',
+    url: '/api/users/create',
+    parent_id: '2',
+    order_num: 2
+  },
+  {
+    id: '7',
+    name: 'Edit User',
+    description: 'Permission to edit user information',
+    type: 'action',
+    url: '/api/users/edit',
+    parent_id: '2',
+    order_num: 3
+  },
+  {
+    id: '8',
+    name: 'Delete User',
+    description: 'Permission to delete user',
+    type: 'action',
+    url: '/api/users/delete',
+    parent_id: '2',
+    order_num: 4
+  },
+  {
+    id: '9',
+    name: 'View Roles',
+    description: 'Permission to view role list',
+    type: 'action',
+    url: '/api/roles',
+    parent_id: '3',
+    order_num: 1
+  },
+  {
+    id: '10',
+    name: 'Create Role',
+    description: 'Permission to create new role',
+    type: 'action',
+    url: '/api/roles/create',
+    parent_id: '3',
+    order_num: 2
+  },
+  {
+    id: '11',
+    name: 'Edit Role',
+    description: 'Permission to edit role information',
+    type: 'action',
+    url: '/api/roles/edit',
+    parent_id: '3',
+    order_num: 3
+  },
+  {
+    id: '12',
+    name: 'Delete Role',
+    description: 'Permission to delete role',
+    type: 'action',
+    url: '/api/roles/delete',
+    parent_id: '3',
+    order_num: 4
+  },
+  {
+    id: '13',
+    name: 'View Permissions',
+    description: 'Permission to view permission list',
+    type: 'action',
+    url: '/api/permissions',
+    parent_id: '4',
+    order_num: 1
+  },
+  {
+    id: '14',
+    name: 'Create Permission',
+    description: 'Permission to create new permission',
+    type: 'action',
+    url: '/api/permissions/create',
+    parent_id: '4',
+    order_num: 2
+  },
+  {
+    id: '15',
+    name: 'Edit Permission',
+    description: 'Permission to edit permission information',
+    type: 'action',
+    url: '/api/permissions/edit',
+    parent_id: '4',
+    order_num: 3
+  },
+  {
+    id: '16',
+    name: 'Delete Permission',
+    description: 'Permission to delete permission',
+    type: 'action',
+    url: '/api/permissions/delete',
+    parent_id: '4',
+    order_num: 4
+  }
+];
 
 export default {
   // 获取权限列表
@@ -114,4 +244,3 @@ export default {
     }
   }
 };
-
