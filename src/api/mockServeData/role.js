@@ -19,11 +19,7 @@ export default {
   // 获取角色列表
   getRole: config => {
     console.log('Mock getRole called with config:', config);
-    const { url } = config;
-    const params = new URLSearchParams(url.split('?')[1]);
-    const name = params.get('name') || '';
-    const page = parseInt(params.get('page')) || 1;
-    const pageSize = parseInt(params.get('pageSize')) || 10;
+    const { name = '', page = 1, pageSize = 10 } = JSON.parse(config.body);
 
     const mockList = List.filter(role => {
       if (name && !role.name.toLowerCase().includes(name.toLowerCase())) {

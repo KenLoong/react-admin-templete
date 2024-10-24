@@ -19,8 +19,8 @@ Mock.mock('/users/edit', 'post', userApi.editUser)
 Mock.mock('/users/delete', 'post', userApi.deleteUser)
 
 // 角色管理相关
-Mock.mock(/\/roles\/?(\?.+)?$/, 'get', roleApi.getRole)
-Mock.mock('/roles', 'post', roleApi.addRole)
+Mock.mock('/roles/list', 'post', roleApi.getRole)
+Mock.mock('/roles/add', 'post', roleApi.addRole)
 Mock.mock('/roles/edit', 'post', roleApi.editRole)
 Mock.mock('/roles/delete', 'post', roleApi.deleteRole)
 

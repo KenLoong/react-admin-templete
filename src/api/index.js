@@ -36,15 +36,15 @@ export const deleteUser = (params) => {
 // 角色管理相关的 API
 export const getRole = (params) => {
   return axios.request({
-    url: '/roles',
-    method: 'get',
-    params
+    url: '/roles/list',
+    method: 'post',
+    data: params
   })
 }
 
 export const addRole = (data) => {
   return axios.request({
-    url: '/roles',
+    url: '/roles/add',
     method: 'post',
     data
   })
@@ -62,7 +62,7 @@ export const deleteRole = (params) => {
   return axios.request({
     url: '/roles/delete',
     method: 'post',
-    data: { id: params.id }
+    data: params
   })
 }
 
