@@ -24,7 +24,10 @@ Mock.mock('/roles', 'post', roleApi.addRole)
 Mock.mock('/roles/edit', 'post', roleApi.editRole)
 Mock.mock('/roles/delete', 'post', roleApi.deleteRole)
 
-// 权限相关
-Mock.mock(/permission\/getMenu/, 'post', permissionApi.getMenu)
+// 权限管理相关
+Mock.mock(/\/permissions(\?.*)?$/, 'get', permissionApi.getPermission)
+Mock.mock('/permissions', 'post', permissionApi.addPermission)
+Mock.mock('/permissions/edit', 'post', permissionApi.editPermission)
+Mock.mock('/permissions/delete', 'post', permissionApi.deletePermission)
 
 export default Mock

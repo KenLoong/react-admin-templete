@@ -85,16 +85,17 @@ export const addPermission = (data) => {
 
 export const editPermission = (data) => {
   return axios.request({
-    url: `/permissions/${data.id}`,
-    method: 'put',
+    url: '/permissions/edit',
+    method: 'post',
     data
   })
 }
 
 export const deletePermission = (params) => {
   return axios.request({
-    url: `/permissions/${params.id}`,
-    method: 'delete'
+    url: '/permissions/delete',
+    method: 'post',
+    data: { id: params.id }
   })
 }
 
@@ -106,4 +107,3 @@ export const login = (data) => {
     data
   })
 }
-

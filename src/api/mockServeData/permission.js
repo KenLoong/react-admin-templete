@@ -1,92 +1,117 @@
 import Mock from 'mockjs'
+
+// 生成模拟权限数据
+let List = []
+const count = 100
+
+for (let i = 0; i < count; i++) {
+  List.push(
+    Mock.mock({
+      id: Mock.Random.guid(),
+      name: Mock.Random.word(5, 10),
+      description: Mock.Random.sentence(10, 20),
+      type: Mock.Random.pick(['menu', 'action']),
+      url: Mock.Random.url(),
+      parent_id: i > 0 ? Mock.Random.integer(1, i) : null,
+      order_num: Mock.Random.integer(1, 100)
+    })
+  )
+}
+
 export default {
-  getMenu: config => {
-    const { username, password } = JSON.parse(config.body)
-    // 先判断用户是否存在
-    // 判断账号和密码是否对应
-    if (username === 'admin' && password === 'admin') {
-      return {
-        code: 20000,
-        data: {
-          menu: [
-            {
-              path: '/home',
-              name: 'home',
-              label: '首页',
-              icon: 's-home',
-              url: 'home/index'
-            },
-            {
-              path: '/mall',
-              name: 'mall',
-              label: '商品管理',
-              icon: 'video-play',
-              url: 'mall/index'
-            },
-            {
-              path: '/user',
-              name: 'user',
-              label: '用户管理',
-              icon: 'user',
-              url: 'User/index'
-            },
-            {
-              label: '其他',
-              icon: 'location',
-              children: [
-                {
-                  path: '/page1',
-                  name: 'page1',
-                  label: '页面1',
-                  icon: 'setting',
-                  url: 'other/pageOne.vue'
-                },
-                {
-                  path: '/page2',
-                  name: 'page2',
-                  label: '页面2',
-                  icon: 'setting',
-                  url: 'other/pageTwo.vue'
-                }
-              ]
-            }
-          ],
-          token: Mock.Random.guid(),
-          message: '获取成功'
-        }
+  // 获取权限列表
+  getPermission: config => {
+    console.log('Mock getPermission called with config:', config);
+    const { url } = config;
+    const params = new URLSearchParams(url.split('?')[1]);
+    const name = params.get('name') || '';
+    const page = parseInt(params.get('page')) || 1;
+    const pageSize = parseInt(params.get('pageSize')) || 10;
+
+    const mockList = List.filter(permission => {
+      if (name && !permission.name.toLowerCase().includes(name.toLowerCase())) {
+        return false;
       }
-    } else if (username === 'xiaoxiao' && password === 'xiaoxiao') {
+      return true;
+    });
+
+    const pageList = mockList.filter((item, index) => index < pageSize * page && index >= pageSize * (page - 1));
+    
+    return {
+      code: 200,
+      total: mockList.length,
+      permissions: pageList
+    };
+  },
+
+  // 添加权限
+  addPermission: config => {
+    console.log('Mock addPermission called with config:', config);
+    const { name, description, type, url, parent_id, order_num } = JSON.parse(config.body);
+    List.unshift({
+      id: Mock.Random.guid(),
+      name,
+      description,
+      type,
+      url,
+      parent_id,
+      order_num
+    });
+    return {
+      code: 200,
+      message: 'Permission added successfully'
+    };
+  },
+
+  // 删除权限
+  deletePermission: config => {
+    console.log('Mock deletePermission called with config:', config);
+    const { id } = JSON.parse(config.body);
+    if (!id) {
       return {
-        code: 20000,
-        data: {
-          menu: [
-            {
-              path: '/',
-              name: 'home',
-              label: '首页',
-              icon: 's-home',
-              url: 'home/index'
-            },
-            {
-              path: '/video',
-              name: 'video',
-              label: '商品管理',
-              icon: 'video-play',
-              url: 'mall/index'
-            }
-          ],
-          token: Mock.Random.guid(),
-          message: '获取成功'
-        }
-      }
+        code: 400,
+        message: 'Invalid parameters: Missing permission ID'
+      };
+    }
+    const index = List.findIndex(u => u.id === id);
+    if (index === -1) {
+      return {
+        code: 404,
+        message: 'Permission not found'
+      };
+    }
+    List.splice(index, 1);
+    return {
+      code: 200,
+      message: 'Permission deleted successfully'
+    };
+  },
+
+  // 编辑权限
+  editPermission: config => {
+    console.log('Mock editPermission called with config:', config);
+    const { id, name, description, type, url, parent_id, order_num } = JSON.parse(config.body);
+    const index = List.findIndex(u => u.id === id);
+    if (index !== -1) {
+      List[index] = {
+        ...List[index],
+        name,
+        description,
+        type,
+        url,
+        parent_id,
+        order_num
+      };
+      return {
+        code: 200,
+        message: 'Permission updated successfully'
+      };
     } else {
       return {
-        code: -999,
-        data: {
-          message: '密码错误'
-        }
-      }
+        code: 404,
+        message: 'Permission not found'
+      };
     }
-
   }
-}
+};
+
