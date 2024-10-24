@@ -52,16 +52,17 @@ export const addRole = (data) => {
 
 export const editRole = (data) => {
   return axios.request({
-    url: `/roles/${data.id}`,
-    method: 'put',
+    url: '/roles/edit',
+    method: 'post',
     data
   })
 }
 
 export const deleteRole = (params) => {
   return axios.request({
-    url: `/roles/${params.id}`,
-    method: 'delete'
+    url: '/roles/delete',
+    method: 'post',
+    data: { id: params.id }
   })
 }
 
