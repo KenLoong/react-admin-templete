@@ -152,14 +152,18 @@ export default {
   // 获取权限列表
   getPermission: config => {
     console.log('Mock getPermission called with config:', config);
-    const { url } = config;
-    const params = new URLSearchParams(url.split('?')[1]);
-    const name = params.get('name') || '';
-    const page = parseInt(params.get('page')) || 1;
-    const pageSize = parseInt(params.get('pageSize')) || 10;
+    let params = {};
+    if (config.body) {
+      try {
+        params = JSON.parse(config.body);
+      } catch (error) {
+        console.error('Error parsing config.body:', error);
+      }
+    }
+    const { name = '', page = 1, pageSize = 10 } = params;
 
     const mockList = List.filter(permission => {
-      if (name && !permission.name.toLowerCase().includes(name.toLowerCase())) {
+      if (name && permission && permission.name && !permission.name.toLowerCase().includes(name.toLowerCase())) {
         return false;
       }
       return true;

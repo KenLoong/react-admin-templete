@@ -20,18 +20,19 @@ const PermissionManagement = () => {
       const response = await getPermission({ page, pageSize, name });
       if (response && response.data && Array.isArray(response.data.permissions)) {
         setPermissions(response.data.permissions);
-        setPagination({
-          ...pagination,
+        setPagination(prev => ({
+          ...prev,
           current: page,
           pageSize: pageSize,
           total: response.data.total || response.data.permissions.length
-        });
+        }));
       } else {
         console.error('Unexpected API response structure:', response);
+        message.error('Failed to fetch permissions: Unexpected response structure');
       }
     } catch (error) {
       console.error('Error fetching permissions:', error);
-      message.error('Failed to fetch permissions: ' + error.message);
+      message.error('Failed to fetch permissions: ' + (error.message || 'Unknown error'));
     }
     setLoading(false);
   };
@@ -117,20 +118,6 @@ const PermissionManagement = () => {
       key: 'url',
     },
     {
-      title: 'Parent Permission',
-      dataIndex: 'parent_id',
-      key: 'parent_id',
-      render: (parentId) => {
-        const parent = permissions.find(p => p.id === parentId);
-        return parent ? parent.name : 'None';
-      }
-    },
-    {
-      title: 'Order',
-      dataIndex: 'order_num',
-      key: 'order_num',
-    },
-    {
       title: 'Action',
       key: 'action',
       render: (_, record) => (
@@ -196,7 +183,6 @@ const PermissionManagement = () => {
           <Form.Item
             name="url"
             label="URL"
-            rules={[{ required: true, message: 'Please input the URL!' }]}
           >
             <Input />
           </Form.Item>
@@ -208,14 +194,11 @@ const PermissionManagement = () => {
               treeData={permissions}
               fieldNames={{ label: 'name', value: 'id', children: 'children' }}
               treeDefaultExpandAll
-              allowClear
-              placeholder="Select parent permission"
             />
           </Form.Item>
           <Form.Item
             name="order_num"
             label="Order Number"
-            rules={[{ required: true, message: 'Please input the order number!' }]}
           >
             <Input type="number" />
           </Form.Item>

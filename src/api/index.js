@@ -69,15 +69,15 @@ export const deleteRole = (params) => {
 // 权限管理相关的 API
 export const getPermission = (params) => {
   return axios.request({
-    url: '/permissions',
-    method: 'get',
-    params
+    url: '/permissions/list',
+    method: 'post',
+    data: params
   })
 }
 
 export const addPermission = (data) => {
   return axios.request({
-    url: '/permissions',
+    url: '/permissions/add',
     method: 'post',
     data
   })
@@ -95,7 +95,7 @@ export const deletePermission = (params) => {
   return axios.request({
     url: '/permissions/delete',
     method: 'post',
-    data: { id: params.id }
+    data: params
   })
 }
 

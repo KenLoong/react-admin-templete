@@ -25,8 +25,8 @@ Mock.mock('/roles/edit', 'post', roleApi.editRole)
 Mock.mock('/roles/delete', 'post', roleApi.deleteRole)
 
 // 权限管理相关
-Mock.mock(/\/permissions(\?.*)?$/, 'get', permissionApi.getPermission)
-Mock.mock('/permissions', 'post', permissionApi.addPermission)
+Mock.mock('/permissions/list', 'post', permissionApi.getPermission)
+Mock.mock('/permissions/add', 'post', permissionApi.addPermission)
 Mock.mock('/permissions/edit', 'post', permissionApi.editPermission)
 Mock.mock('/permissions/delete', 'post', permissionApi.deletePermission)
 
