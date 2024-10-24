@@ -1,63 +1,75 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Menu, Layout } from 'antd'
 import * as Icon from "@ant-design/icons"
 import { useNavigate } from 'react-router-dom'
-import MenuConfig from '../../config' // 定义侧边栏
 import { useDispatch } from "react-redux"
 import { selectMenuList } from '../../store/reducers/tab'
+import { getPermission } from '../../api'  // 假设我们有这个 API 函数
 
 const { Sider } = Layout
 
 // 根据name选择icon
-const iconToElement = (name) => React.createElement(Icon[name]);
-// 遍历侧边栏定义
-const items = MenuConfig.map((icon) => {
-  const child = {
-    key: `${icon.path}`,
-    icon: iconToElement(icon.icon),
-    label: `${icon.label}`
-  }
-  if (icon.children) { // children 属性不为空，则说明有子菜单
-    child.children = icon.children.map(item => {
-      return {
-        key: item.path, // key是组件的唯一标识
-        label: item.label
-      }
-    })
-  }
-  return child
-})
+const iconToElement = (name) => React.createElement(Icon[name] || Icon.AppstoreOutlined);
+
 const CommonAside = ({ collapsed }) => {
   const navigate = useNavigate()
   const dispatch = useDispatch()
+  const [permissions, setPermissions] = useState([])
+
+  useEffect(() => {
+    const fetchPermissions = async () => {
+      try {
+        const response = await getPermission();
+        if (response && response.data && Array.isArray(response.data.permissions)) {
+          setPermissions(response.data.permissions);
+        }
+      } catch (error) {
+        console.error('Error fetching permissions:', error);
+      }
+    };
+
+    fetchPermissions();
+  }, []);
+
+  // 生成菜单项
+  const generateMenuItems = (menuItems) => {
+    return menuItems.filter(item => item.type === 'menu').map((item) => {
+      const menuItem = {
+        key: item.url,  // 使用 url 作为 key
+        icon: iconToElement(item.icon || 'AppstoreOutlined'),
+        label: item.name,
+      }
+
+      const children = permissions.filter(child => child.parent_id === item.id && child.type === 'menu');
+      if (children.length > 0) {
+        menuItem.children = generateMenuItems(children);
+      }
+
+      return menuItem;
+    });
+  }
+
+  const items = generateMenuItems(permissions.filter(item => item.parent_id === null));
 
   // 添加数据到store
   const setTabsList = (val) => {
     dispatch(selectMenuList(val))
   }
+
   // 点击菜单(实现跳转)
   const selectMenu = (e) => {
-    let data
-    MenuConfig.forEach((item) => {
-      // 找到当前的数据
-      if (item.path === e.keyPath[e.keyPath.length - 1]) {
-        data = item
-        // 如果是有二级菜单
-        if (e.keyPath.length > 1) {
-          data = item.children.find((child) => {
-            return child.path === e.key
-          })
-        }
-      }
-    })
-    setTabsList({
-      path: data.path,
-      name: data.name,
-      label: data.label
-    })
-    // 页面跳转
-    navigate(e.key)
+    const selectedItem = permissions.find(item => item.url === e.key);
+    if (selectedItem) {
+      setTabsList({
+        path: selectedItem.url,
+        name: selectedItem.name,
+        label: selectedItem.name
+      })
+      // 页面跳转
+      navigate(e.key)
+    }
   }
+
   return (
     <Sider
       width={200}

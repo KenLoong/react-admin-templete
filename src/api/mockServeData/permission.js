@@ -7,7 +7,7 @@ let List = [
     name: 'System Management',
     description: 'Permissions related to system management',
     type: 'menu',
-    url: '/system',
+    url: '/',
     parent_id: null,
     order_num: 1
   },
@@ -16,7 +16,7 @@ let List = [
     name: 'User Management',
     description: 'Permissions related to user management',
     type: 'menu',
-    url: '/system/user',
+    url: '/users',
     parent_id: '1',
     order_num: 1
   },
@@ -25,7 +25,7 @@ let List = [
     name: 'Role Management',
     description: 'Permissions related to role management',
     type: 'menu',
-    url: '/system/role',
+    url: '/roles',
     parent_id: '1',
     order_num: 2
   },
@@ -34,7 +34,7 @@ let List = [
     name: 'Permission Management',
     description: 'Permissions related to permission management',
     type: 'menu',
-    url: '/system/permission',
+    url: '/permissions',
     parent_id: '1',
     order_num: 3
   },

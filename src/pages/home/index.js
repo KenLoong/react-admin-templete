@@ -3,7 +3,6 @@ import { Col, Row, Card, Table } from 'antd'
 import { getData } from '../../api/old-index' // 引入http request func
 import "./home.css"
 import * as Icon from "@ant-design/icons";
-import MyEcharts from '../../components/Echarts'
 
 const columns = [
   {
