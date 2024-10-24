@@ -13,8 +13,8 @@ Mock.setup({
 Mock.mock('/home/getData', homeApi.getStatisticalData)
 
 // 用户管理相关
-Mock.mock(/\/users\/?(\?.+)?$/, 'get', userApi.getUser)
-Mock.mock('/users', 'post', userApi.addUser)
+Mock.mock('/users/list', 'post', userApi.getUser)
+Mock.mock('/users/add', 'post', userApi.addUser)
 Mock.mock('/users/edit', 'post', userApi.editUser)
 Mock.mock('/users/delete', 'post', userApi.deleteUser)
 

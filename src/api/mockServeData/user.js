@@ -47,7 +47,7 @@ export default {
   // 获取用户列表
   getUser: config => {
     console.log('Mock getUser called with config:', config);
-    const { username, page = 1, pageSize = 10 } = param2Obj(config.url, config.type, config.body)
+    const { username, page = 1, pageSize = 10 } = JSON.parse(config.body);
     console.log('Parsed parameters:', { username, page, pageSize });
     
     const mockList = List.filter(user => {
@@ -69,8 +69,7 @@ export default {
 
   // 添加用户
   addUser: config => {
-    const params = param2Obj(config.url, config.type, config.body);
-    const { username, status } = params;
+    const { username, status } = JSON.parse(config.body);
     List.unshift({
       id: Mock.Random.guid(),
       username: username,
@@ -86,8 +85,7 @@ export default {
   // 删除用户
   deleteUser: config => {
     console.log('Mock deleteUser called with config:', config);
-    const { url, body } = config;
-    const id = JSON.parse(body).id;
+    const { id } = JSON.parse(config.body);
 
     if (!id) {
       console.log('Invalid parameters: Missing user ID');
@@ -116,8 +114,7 @@ export default {
 
   // 更新用户
   editUser: config => {
-    const params = param2Obj(config.url, config.type, config.body);
-    const { id, username, status } = params;
+    const { id, username, status } = JSON.parse(config.body);
     const index = List.findIndex(u => u.id === id);
     if (index !== -1) {
       List[index] = {

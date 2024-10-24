@@ -3,15 +3,15 @@ import axios from './axios'
 // 用户管理相关的 API
 export const getUser = (params) => {
   return axios.request({
-    url: '/users',
-    method: 'get',
-    params
+    url: '/users/list',
+    method: 'post',
+    data: params
   })
 }
 
 export const addUser = (data) => {
   return axios.request({
-    url: '/users',
+    url: '/users/add',
     method: 'post',
     data
   })
@@ -19,7 +19,7 @@ export const addUser = (data) => {
 
 export const editUser = (data) => {
   return axios.request({
-    url: `/users/edit`,
+    url: '/users/edit',
     method: 'post',
     data
   })
@@ -27,9 +27,9 @@ export const editUser = (data) => {
 
 export const deleteUser = (params) => {
   return axios.request({
-    url: `/users/delete`,
+    url: '/users/delete',
     method: 'post',
-    data: { id: params.id }
+    data: params
   })
 }
 

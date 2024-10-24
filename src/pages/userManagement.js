@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Space, Button, Input, Modal, Form, message, Popconfirm } from 'antd';
+import { Table, Space, Button, Input, Modal, Form, message, Popconfirm, Select } from 'antd';
 import { getUser, addUser, editUser, deleteUser } from '../api';
 
 const { Search } = Input;
+const { Option } = Select;
 
 const UserManagement = () => {
   const [users, setUsers] = useState([]);
@@ -14,24 +15,18 @@ const UserManagement = () => {
   const [searchText, setSearchText] = useState('');
   const [deletingId, setDeletingId] = useState(null);
 
-
   const fetchUsers = async (page = 1, pageSize = 10, searchText = '') => {
     setLoading(true);
     try {
       const response = await getUser({ page, pageSize, username: searchText });
-      console.log('API response:', response);
-      console.log('API response data:', response.data);
-      console.log('API response users:', response.data?.users);
-      
       if (response && response.data && Array.isArray(response.data.users)) {
         setUsers(response.data.users);
-        console.log('Users state after update:', response.data.users);
-        setPagination({
-          ...pagination,
+        setPagination(prev => ({
+          ...prev,
           current: page,
           pageSize: pageSize,
           total: response.data.total || response.data.users.length
-        });
+        }));
       } else {
         console.error('Unexpected API response structure:', response);
       }
@@ -42,13 +37,7 @@ const UserManagement = () => {
     setLoading(false);
   };
 
-  // 添加这个新的 useEffect
   useEffect(() => {
-    console.log('Users state changed:', users);
-  }, [users]);
-
-  useEffect(() => {
-    console.log('userManagement Component mounted'); // 添加这行
     fetchUsers();
   }, []);
 
@@ -62,6 +51,7 @@ const UserManagement = () => {
   };
 
   const handleAdd = () => {
+    
     setEditingUserId(null);
     form.resetFields();
     setModalVisible(true);
