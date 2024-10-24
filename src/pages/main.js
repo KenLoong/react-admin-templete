@@ -1,7 +1,6 @@
 import React from 'react'
 import { Outlet } from 'react-router-dom';
 import { Layout } from 'antd'
-import CommonTag from '../components/commonTag';
 import CommonHeader from '../components/commonHeader'
 import CommonAside from '../components/commonAside';// 侧边栏组件
 import { useSelector } from 'react-redux'
@@ -23,7 +22,6 @@ const Main = () => {
         <CommonAside collapsed={collapsed} />
         <Layout>
           <CommonHeader collapsed={collapsed} />
-        {/*  <CommonTag /> */}
           <Content
             style={{
               padding: 24,

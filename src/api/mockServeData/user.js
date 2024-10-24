@@ -1,137 +1,138 @@
 import Mock from 'mockjs'
 
-// get请求从config.url获取参数，post从config.body中获取参数
-function param2Obj (url) {
-  const search = url.split('?')[1]
-  if (!search) {
-    return {}
+function param2Obj(url, type, body) {
+  const [path, query] = url.split('?');
+  const params = {};
+
+  // 处理查询参数
+  if (query) {
+    query.split('&').forEach(item => {
+      const [key, value] = item.split('=');
+      params[key] = decodeURIComponent(value);
+    });
   }
-  return JSON.parse(
-    '{"' +
-    decodeURIComponent(search)
-      .replace(/"/g, '\\"')
-      .replace(/&/g, '","')
-      .replace(/=/g, '":"') +
-    '"}'
-  )
+
+  // 处理路径参数
+  const pathParts = path.split('/');
+  if (pathParts.length > 2) {
+    params.id = pathParts[pathParts.length - 1];
+  }
+
+  // 根据 HTTP 方法处理请求体
+  if (type.toLowerCase() === 'post' || type.toLowerCase() === 'put') {
+    if (body) {
+      Object.assign(params, JSON.parse(body));
+    }
+  }
+
+  return params;
 }
 
+// 生成模拟用户数据
 let List = []
-const count = 200
+const count = 100
 
 for (let i = 0; i < count; i++) {
   List.push(
     Mock.mock({
       id: Mock.Random.guid(),
-      name: Mock.Random.cname(),
-      addr: Mock.mock('@county(true)'),
-      'age|18-60': 1,
-      birth: Mock.Random.date(),
-      sex: Mock.Random.integer(0, 1)
+      username: Mock.Random.word(5, 10),
+      'status|1': ['active', 'inactive'],
+      createdAt: Mock.Random.datetime()
     })
   )
 }
 
 export default {
-  /**
-   * 获取列表
-   * 要带参数 name, page, limt; name可以不填, page,limit有默认值。
-   * @param name, page, limit
-   * @return {{code: number, count: number, data: *[]}}
-   */
-  getUserList: config => {
-    const { name, page = 1, limit = 20 } = param2Obj(config.url)
+  // 获取用户列表
+  getUser: config => {
+    console.log('Mock getUser called with config:', config);
+    const { username, page = 1, pageSize = 10 } = param2Obj(config.url, config.type, config.body)
+    console.log('Parsed parameters:', { username, page, pageSize });
+    
     const mockList = List.filter(user => {
-      if (name && user.name.indexOf(name) === -1 && user.addr.indexOf(name) === -1) return false
-      return true
+      if (username && !user.username.toLowerCase().includes(username.toLowerCase())) {
+        return false;
+      }
+      return true;
     })
-    const pageList = mockList.filter((item, index) => index < limit * page && index >= limit * (page - 1))
-    return {
-      code: 20000,
-      count: mockList.length,
-      list: pageList
-    }
+    const pageList = mockList.filter((item, index) => index < pageSize * page && index >= pageSize * (page - 1))
+    
+    const result = {
+      code: 200,
+      total: mockList.length,
+      users: pageList
+    };
+    console.log('Mock getUser returning:', result);
+    return result;
   },
-  /**
-   * 增加用户
-   * @param name, addr, age, birth, sex
-   * @return {{code: number, data: {message: string}}}
-   */
-  createUser: config => {
-    const { name, addr, age, birth, sex } = JSON.parse(config.body)
+
+  // 添加用户
+  addUser: config => {
+    const params = param2Obj(config.url, config.type, config.body);
+    const { username, status } = params;
     List.unshift({
       id: Mock.Random.guid(),
-      name: name,
-      addr: addr,
-      age: age,
-      birth: birth,
-      sex: sex
+      username: username,
+      status: status,
+      createdAt: Mock.Random.now()
     })
     return {
-      code: 20000,
-      data: {
-        message: '添加成功'
-      }
+      code: 200,
+      message: 'User added successfully'
     }
   },
-  /**
-   * 删除用户
-   * @param id
-   * @return {*}
-   */
+
+  // 删除用户
   deleteUser: config => {
-    const { id } = JSON.parse(config.body)
+    console.log('Mock deleteUser called with config:', config);
+    const { url, body } = config;
+    const id = JSON.parse(body).id;
+
     if (!id) {
+      console.log('Invalid parameters: Missing user ID');
       return {
-        code: -999,
-        message: '参数不正确'
+        code: 400,
+        message: 'Invalid parameters: Missing user ID'
+      }
+    }
+
+    const index = List.findIndex(u => u.id === id);
+    if (index === -1) {
+      console.log('User not found');
+      return {
+        code: 404,
+        message: 'User not found'
+      }
+    }
+
+    List.splice(index, 1);
+    console.log('User deleted successfully');
+    return {
+      code: 200,
+      message: 'User deleted successfully'
+    }
+  },
+
+  // 更新用户
+  editUser: config => {
+    const params = param2Obj(config.url, config.type, config.body);
+    const { id, username, status } = params;
+    const index = List.findIndex(u => u.id === id);
+    if (index !== -1) {
+      List[index] = {
+        ...List[index],
+        username,
+        status
+      }
+      return {
+        code: 200,
+        message: 'User updated successfully'
       }
     } else {
-      List = List.filter(u => u.id !== id)
       return {
-        code: 20000,
-        message: '删除成功'
-      }
-    }
-  },
-  /**
-   * 批量删除
-   * @param config
-   * @return {{code: number, data: {message: string}}}
-   */
-  batchremove: config => {
-    let { ids } = param2Obj(config.url)
-    ids = ids.split(',')
-    List = List.filter(u => !ids.includes(u.id))
-    return {
-      code: 20000,
-      data: {
-        message: '批量删除成功'
-      }
-    }
-  },
-  /**
-   * 修改用户
-   * @param id, name, addr, age, birth, sex
-   * @return {{code: number, data: {message: string}}}
-   */
-  updateUser: config => {
-    const { id, name, addr, age, birth, sex } = JSON.parse(config.body)
-    const sex_num = parseInt(sex)
-    List.some(u => {
-      if (u.id === id) {
-        u.name = name
-        u.addr = addr
-        u.age = age
-        u.birth = birth
-        u.sex = sex_num
-        return true
-      }
-    })
-    return {
-      code: 20000,
-      data: {
-        message: '编辑成功'
+        code: 404,
+        message: 'User not found'
       }
     }
   }

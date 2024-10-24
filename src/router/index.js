@@ -1,17 +1,17 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom'
 import Main from '../pages/main'
 import Home from '../pages/home'
-import Mall from '../pages/mall'
-import User from '../pages/user'
-import pageOne from '../pages/other/pageOne'
-import pageTwo from '../pages/other/pageTwo'
+import UserManagement from '../pages/userManagement'
+import RoleManagement from '../pages/roleManagement'
+import PermissionManagement from '../pages/permissionManagement'
 import Login from '../pages/login'
+import { RouterAuth } from './routerAuth'
 
 // 路由配置和对应的页面
 const routes = [
     {
         path: '/',
-        Component: Main, // 展示的内容
+        element: <RouterAuth><Main /></RouterAuth>,
         children: [
             {
                 path: '/',
@@ -22,25 +22,16 @@ const routes = [
                 Component: Home,
             },
             {
-                path: 'mall',
-                Component: Mall,
+                path: 'users',
+                Component: UserManagement,
             },
             {
-                path: 'user',
-                Component: User,
+                path: 'roles',
+                Component: RoleManagement,
             },
             {
-                path: 'other',
-                children: [
-                    {
-                        path: 'pageOne',
-                        Component: pageOne
-                    },
-                    {
-                        path: 'pageTwo',
-                        Component: pageTwo
-                    }
-                ]
+                path: 'permissions',
+                Component: PermissionManagement,
             }
         ]
     },
@@ -49,4 +40,5 @@ const routes = [
         Component: Login
     }
 ]
+
 export default createBrowserRouter(routes)
