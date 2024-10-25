@@ -70,13 +70,15 @@ export default {
   // 添加角色
   addRole: config => {
     console.log('Mock addRole called with config:', config);
-    const { name, description } = JSON.parse(config.body)
-    List.unshift({
+    const { name, description, permissionIds } = JSON.parse(config.body)
+    const newRole = {
       id: Mock.Random.guid(),
       name: name,
       description: description,
+      permissions: permissionIds.map(id => ({ id, name: `Permission ${id}` })),
       createdAt: Mock.Random.now()
-    })
+    }
+    List.unshift(newRole)
     return {
       code: 200,
       message: 'Role added successfully'
@@ -110,13 +112,14 @@ export default {
   // 编辑角色
   editRole: config => {
     console.log('Mock editRole called with config:', config);
-    const { id, name, description } = JSON.parse(config.body)
+    const { id, name, description, permissionIds } = JSON.parse(config.body)
     const index = List.findIndex(u => u.id === id)
     if (index !== -1) {
       List[index] = {
         ...List[index],
         name,
-        description
+        description,
+        permissions: permissionIds.map(id => ({ id, name: `Permission ${id}` }))
       }
       return {
         code: 200,

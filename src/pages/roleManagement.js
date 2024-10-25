@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Space, Button, Input, message, Modal, Form } from 'antd';
-import { getRole, addRole, editRole, deleteRole } from '../api';
+import { Table, Space, Button, Input, message, Modal, Form, Select, Tag } from 'antd';
+import { getRole, addRole, editRole, deleteRole, getPermission } from '../api';
 
 const { Search } = Input;
+const { Option } = Select;
 
 const RoleManagement = () => {
   const [roles, setRoles] = useState([]);
+  const [permissions, setPermissions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [pagination, setPagination] = useState({ current: 1, pageSize: 10, total: 0 });
   const [searchText, setSearchText] = useState('');
@@ -35,8 +37,23 @@ const RoleManagement = () => {
     setLoading(false);
   };
 
+  const fetchPermissions = async () => {
+    try {
+      const response = await getPermission({ page: 1, pageSize: 1000 });
+      if (response && response.data && Array.isArray(response.data.permissions)) {
+        setPermissions(response.data.permissions);
+      } else {
+        console.error('Unexpected API response structure for permissions:', response);
+      }
+    } catch (error) {
+      console.error('Error fetching permissions:', error);
+      message.error('Failed to fetch permissions: ' + error.message);
+    }
+  };
+
   useEffect(() => {
     fetchRoles();
+    fetchPermissions();
   }, []);
 
   const handleTableChange = (pagination) => {
@@ -59,15 +76,19 @@ const RoleManagement = () => {
     }
   };
 
-  const handleAdd = () => {
-    setEditingRole(null);
-    form.resetFields();
+  const handleEdit = (record) => {
+    setEditingRole(record);
+    form.setFieldsValue({
+      name: record.name,
+      description: record.description,
+      permissionIds: record.permissions ? record.permissions.map(p => p.id) : []
+    });
     setModalVisible(true);
   };
 
-  const handleEdit = (record) => {
-    setEditingRole(record);
-    form.setFieldsValue(record);
+  const handleAdd = () => {
+    setEditingRole(null);
+    form.resetFields();
     setModalVisible(true);
   };
 
@@ -82,11 +103,17 @@ const RoleManagement = () => {
         message.success('Role added successfully');
       }
       setModalVisible(false);
+      form.resetFields();
       fetchRoles(pagination.current, pagination.pageSize, searchText);
     } catch (error) {
       console.error('Error saving role:', error);
       message.error('Failed to save role: ' + error.message);
     }
+  };
+
+  const handleModalCancel = () => {
+    setModalVisible(false);
+    form.resetFields();
   };
 
   const columns = [
@@ -104,6 +131,20 @@ const RoleManagement = () => {
       title: 'Description',
       dataIndex: 'description',
       key: 'description',
+    },
+    {
+      title: 'Permissions',
+      dataIndex: 'permissions',
+      key: 'permissions',
+      render: (permissions) => (
+        <>
+          {permissions && permissions.map(perm => (
+            <Tag color="blue" key={perm.id}>
+              {perm.name}
+            </Tag>
+          ))}
+        </>
+      ),
     },
     {
       title: 'Action',
@@ -142,7 +183,7 @@ const RoleManagement = () => {
         title={editingRole ? "Edit Role" : "Add Role"}
         visible={modalVisible}
         onOk={handleModalOk}
-        onCancel={() => setModalVisible(false)}
+        onCancel={handleModalCancel}
       >
         <Form form={form} layout="vertical">
           <Form.Item
@@ -157,6 +198,17 @@ const RoleManagement = () => {
             label="Description"
           >
             <Input.TextArea />
+          </Form.Item>
+          <Form.Item
+            name="permissionIds"
+            label="Permissions"
+            rules={[{ required: true, message: 'Please select at least one permission!' }]}
+          >
+            <Select mode="multiple" placeholder="Select permissions">
+              {permissions.map(permission => (
+                <Option key={permission.id} value={permission.id}>{permission.name}</Option>
+              ))}
+            </Select>
           </Form.Item>
         </Form>
       </Modal>
