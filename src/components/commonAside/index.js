@@ -25,18 +25,27 @@ const CommonAside = ({ collapsed }) => {
           const systemManagement = permissions.find(item => item.name === 'System Management');
           
           if (systemManagement) {
-            const menuData = [{
-              key: systemManagement.url,
-              icon: iconToElement(systemManagement.icon || 'AppstoreOutlined'),
-              label: systemManagement.name,
-              children: permissions
-                .filter(item => item.parent_id === systemManagement.id && item.type === 'menu')
-                .map(item => ({
-                  key: item.url,
-                  icon: iconToElement(item.icon || 'AppstoreOutlined'),
-                  label: item.name,
-                }))
-            }];
+            const menuData = [
+              // 固定的 Home 菜单项
+              {
+                key: '/home',
+                icon: iconToElement('HomeOutlined'),
+                label: 'Home',
+              },
+              // System Management 及其子菜单
+              {
+                key: systemManagement.url,
+                icon: iconToElement(systemManagement.icon || 'AppstoreOutlined'),
+                label: systemManagement.name,
+                children: permissions
+                  .filter(item => item.parent_id === systemManagement.id && item.type === 'menu')
+                  .map(item => ({
+                    key: item.url,
+                    icon: iconToElement(item.icon || 'AppstoreOutlined'),
+                    label: item.name,
+                  }))
+              }
+            ];
             setMenuItems(menuData);
           }
         }
