@@ -1,7 +1,7 @@
 import React from 'react'
 import { Form, Input, Button, message } from 'antd';
 import "./login.css"
-import { getMenu } from '../../api/old-index'
+import { getMenu } from '../../api/index'
 import { useNavigate, Navigate } from 'react-router-dom'
 
 const Login = () => {

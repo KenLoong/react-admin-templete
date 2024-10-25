@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Col, Row, Card, Table } from 'antd'
-import { getData } from '../../api/old-index' // 引入http request func
+import { getData } from '../../api/index' // 引入http request func
 import "./home.css"
 import * as Icon from "@ant-design/icons";
 

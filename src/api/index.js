@@ -107,3 +107,19 @@ export const login = (data) => {
     data
   })
 }
+
+// 从 old-index.js 合并的 API
+export const getMenu = (param) => {
+  return axios.request({
+    url: '/permission/getMenu',
+    method: 'post',
+    data: param
+  })
+}
+
+export const getData = () => {
+  return axios.request({
+    url: '/home/getData',
+    method: 'get'
+  })
+}
