@@ -44,14 +44,17 @@ const UserManagement = () => {
   const fetchRoles = async () => {
     try {
       const response = await getRole({ page: 1, pageSize: 100 });
-      if (response && response.data && Array.isArray(response.data.roles)) {
-        setRoles(response.data.roles);
+      console.log('Roles API response:', response); // 添加这行来查看 API 响应
+      if (response && response.code === 200 && Array.isArray(response.roles)) {
+        setRoles(response.roles);
+        console.log('Roles set:', response.roles); // 添加这行来确认角色已被设置
       } else {
         console.error('Unexpected API response structure for roles:', response);
+        message.error('获取角色列表失败：意外的响应结构');
       }
     } catch (error) {
       console.error('Error fetching roles:', error);
-      message.error('Failed to fetch roles: ' + error.message);
+      message.error('获取角色列表失败：' + (error.message || '未知错误'));
     }
   };
 
@@ -59,6 +62,10 @@ const UserManagement = () => {
     fetchUsers();
     fetchRoles();
   }, []);
+
+  useEffect(() => {
+    console.log('Users updated:', users);
+  }, [users]);
 
   useEffect(() => {
     console.log('Roles updated:', roles);
