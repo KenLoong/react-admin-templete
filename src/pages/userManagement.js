@@ -22,7 +22,7 @@ const UserManagement = () => {
     try {
       const response = await getUser({ page, pageSize, username: searchText });
       console.log('getUser response:', response);
-      if (response.code === 200 && response.data && Array.isArray(response.data.list)) {
+      if (response.data && response.data.code === 200 && Array.isArray(response.data.list)) {
         setUsers(response.data.list);
         setPagination(prev => ({
           ...prev,
@@ -44,10 +44,10 @@ const UserManagement = () => {
   const fetchRoles = async () => {
     try {
       const response = await getRole({ page: 1, pageSize: 100 });
-      console.log('Roles API response:', response); // 添加这行来查看 API 响应
-      if (response && response.code === 200 && Array.isArray(response.roles)) {
-        setRoles(response.roles);
-        console.log('Roles set:', response.roles); // 添加这行来确认角色已被设置
+      console.log('Roles API response:', response);
+      if (response.data && response.data.code === 200 && Array.isArray(response.data.roles)) {
+        setRoles(response.data.roles);
+        console.log('Roles set:', response.data.roles);
       } else {
         console.error('Unexpected API response structure for roles:', response);
         message.error('获取角色列表失败：意外的响应结构');
@@ -103,12 +103,12 @@ const UserManagement = () => {
       console.log('Deleting user with id:', id);
       const response = await deleteUser({ id });
       console.log('Delete response:', response);
-      if (response && response.data && response.data.code === 200) {
+      if (response.data && response.data.code === 200) {
         message.success('User deleted successfully');
         fetchUsers(pagination.current, pagination.pageSize, searchText);
       } else {
         console.error('Unexpected delete response:', response);
-        message.error('Failed to delete user: ' + (response?.data?.message || 'Unknown error'));
+        message.error('Failed to delete user: ' + (response.data?.message || 'Unknown error'));
       }
     } catch (error) {
       console.error('Error deleting user:', error);
@@ -121,28 +121,32 @@ const UserManagement = () => {
   const handleModalOk = async () => {
     try {
       const values = await form.validateFields();
+      console.log('Form values:', values);
       if (editingUserId) {
-        const response = await editUser({ ...values, id: editingUserId });
-        if (response && response.data && response.data.code === 200) {
+        const editParams = { id: editingUserId, ...values };
+        console.log('Editing user with params:', editParams);
+        const response = await editUser(editParams);
+        console.log('Edit user response:', response);
+        if (response.data && response.data.code === 200) {
           message.success('User updated successfully');
           setModalVisible(false);
           fetchUsers(pagination.current, pagination.pageSize, searchText);
         } else {
-          message.error('Failed to update user: ' + (response?.data?.message || 'Unknown error'));
+          message.error('Failed to update user: ' + (response.data?.message || 'Unknown error'));
         }
       } else {
         const response = await addUser(values);
-        if (response && response.data && response.data.code === 200) {
+        if (response.data && response.data.code === 200) {
           message.success('User added successfully');
           setModalVisible(false);
           fetchUsers(pagination.current, pagination.pageSize, searchText);
         } else {
-          message.error('Failed to add user: ' + (response?.data?.message || 'Unknown error'));
+          message.error('Failed to add user: ' + (response.data?.message || 'Unknown error'));
         }
       }
     } catch (error) {
-      console.error('Error saving user:', error);
-      message.error('Validation failed: ' + error.message);
+      console.error('Error in handleModalOk:', error);
+      message.error('Operation failed: ' + error.message);
     }
   };
 

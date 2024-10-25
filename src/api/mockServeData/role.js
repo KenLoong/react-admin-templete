@@ -103,6 +103,7 @@ export default {
     List.unshift(newRole)
     return {
       code: 200,
+      role: newRole,
       message: 'Role added successfully'
     }
   },
@@ -148,6 +149,7 @@ export default {
       }
       return {
         code: 200,
+        role: List[index],
         message: 'Role updated successfully'
       }
     } else {

@@ -26,7 +26,7 @@ instance.interceptors.request.use(
 instance.interceptors.response.use(
   response => {
     console.log('Axios response interceptor called', response);
-    return response.data
+    return response
   },
   error => {
     console.error('Axios response error:', error)

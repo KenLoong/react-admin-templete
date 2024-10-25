@@ -20,13 +20,13 @@ const RoleManagement = () => {
     try {
       const response = await getRole({ page, pageSize, name });
       console.log('getRole response:', response);
-      if (response && response.code === 200 && Array.isArray(response.roles)) {
-        setRoles(response.roles);
+      if (response.data && response.data.code === 200 && Array.isArray(response.data.roles)) {
+        setRoles(response.data.roles);
         setPagination({
           ...pagination,
           current: page,
           pageSize: pageSize,
-          total: response.total || response.roles.length
+          total: response.data.total || response.data.roles.length
         });
       } else {
         console.error('Unexpected API response structure:', response);
@@ -42,7 +42,7 @@ const RoleManagement = () => {
   const fetchPermissions = async () => {
     try {
       const response = await getPermission({ page: 1, pageSize: 1000 });
-      if (response && response.data && Array.isArray(response.data.permissions)) {
+      if (response.data && response.data.code === 200 && Array.isArray(response.data.permissions)) {
         setPermissions(response.data.permissions);
       } else {
         console.error('Unexpected API response structure for permissions:', response);
@@ -69,9 +69,13 @@ const RoleManagement = () => {
 
   const handleDelete = async (id) => {
     try {
-      await deleteRole({ id });
-      message.success('Role deleted successfully');
-      fetchRoles(pagination.current, pagination.pageSize, searchText);
+      const response = await deleteRole({ id });
+      if (response.data && response.data.code === 200) {
+        message.success('Role deleted successfully');
+        fetchRoles(pagination.current, pagination.pageSize, searchText);
+      } else {
+        message.error('Failed to delete role: ' + (response.data?.message || 'Unknown error'));
+      }
     } catch (error) {
       console.error('Error deleting role:', error);
       message.error('Failed to delete role: ' + error.message);
@@ -98,23 +102,27 @@ const RoleManagement = () => {
     try {
       const values = await form.validateFields();
       const selectedPermissions = permissions.filter(p => values.permissionIds.includes(p.id));
+      let response;
       if (editingRole) {
-        await editRole({ 
+        response = await editRole({ 
           ...values, 
           id: editingRole.id,
           permissions: selectedPermissions.map(p => ({ id: p.id, name: p.name }))
         });
-        message.success('Role updated successfully');
       } else {
-        await addRole({
+        response = await addRole({
           ...values,
           permissions: selectedPermissions.map(p => ({ id: p.id, name: p.name }))
         });
-        message.success('Role added successfully');
       }
-      setModalVisible(false);
-      form.resetFields();
-      fetchRoles(pagination.current, pagination.pageSize, searchText);
+      if (response.data && response.data.code === 200) {
+        message.success(editingRole ? 'Role updated successfully' : 'Role added successfully');
+        setModalVisible(false);
+        form.resetFields();
+        fetchRoles(pagination.current, pagination.pageSize, searchText);
+      } else {
+        message.error('Failed to save role: ' + (response.data?.message || 'Unknown error'));
+      }
     } catch (error) {
       console.error('Error saving role:', error);
       message.error('Failed to save role: ' + error.message);

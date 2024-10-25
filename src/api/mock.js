@@ -75,9 +75,10 @@ Mock.mock('/users/add', 'post', (options) => {
 })
 
 Mock.mock('/users/edit', 'post', (options) => {
+    console.log('Mock /users/edit called with options:', options);
     const authResult = authMiddleware()
     if (authResult) return authResult
-    return userApi.editUser(JSON.parse(options.body))
+    return userApi.editUser(options)
 })
 
 Mock.mock('/users/delete', 'post', (options) => {

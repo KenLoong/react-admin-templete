@@ -14,14 +14,14 @@ const Login = () => {
       console.log('Login attempt with values:', values);
       const response = await login(values.username, values.password);
       console.log('Login response:', response);
-      if (response.code === 200 && response.data && response.data.token) {
+      if (response.data && response.data.code === 200 && response.data.token) {
         localStorage.setItem('token', response.data.token);
         console.log('Token stored in localStorage:', response.data.token);
         message.success('登录成功');
         navigate('/home');
       } else {
         console.error('Unexpected login response:', response);
-        message.error(response.message || '登录失败');
+        message.error(response.data?.message || '登录失败');
       }
     } catch (error) {
       console.error('Login error:', error);

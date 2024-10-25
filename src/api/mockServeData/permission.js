@@ -113,7 +113,7 @@ export default {
   addPermission: config => {
     console.log('Mock addPermission called with config:', config);
     const { name, description, type, url, parent_id, order_num } = JSON.parse(config.body);
-    List.unshift({
+    const newPermission = {
       id: Mock.Random.guid(),
       name,
       description,
@@ -121,9 +121,11 @@ export default {
       url,
       parent_id,
       order_num
-    });
+    };
+    List.unshift(newPermission);
     return {
       code: 200,
+      permission: newPermission,
       message: 'Permission added successfully'
     };
   },
@@ -169,6 +171,7 @@ export default {
       };
       return {
         code: 200,
+        permission: List[index],
         message: 'Permission updated successfully'
       };
     } else {

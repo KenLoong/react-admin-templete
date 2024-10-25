@@ -19,7 +19,7 @@ const PermissionManagement = () => {
     setLoading(true);
     try {
       const response = await getPermission({ page, pageSize, name, ...filters });
-      if (response && response.data && Array.isArray(response.data.permissions)) {
+      if (response.data && response.data.code === 200 && Array.isArray(response.data.permissions)) {
         setPermissions(response.data.permissions);
         setPagination(prev => ({
           ...prev,
@@ -54,9 +54,13 @@ const PermissionManagement = () => {
 
   const handleDelete = async (id) => {
     try {
-      await deletePermission({ id });
-      message.success('Permission deleted successfully');
-      fetchPermissions(pagination.current, pagination.pageSize, searchText, filters);
+      const response = await deletePermission({ id });
+      if (response.data && response.data.code === 200) {
+        message.success('Permission deleted successfully');
+        fetchPermissions(pagination.current, pagination.pageSize, searchText, filters);
+      } else {
+        message.error('Failed to delete permission: ' + (response.data?.message || 'Unknown error'));
+      }
     } catch (error) {
       console.error('Error deleting permission:', error);
       message.error('Failed to delete permission: ' + error.message);
@@ -78,15 +82,19 @@ const PermissionManagement = () => {
   const handleModalOk = async () => {
     try {
       const values = await form.validateFields();
+      let response;
       if (editingPermission) {
-        await editPermission({ ...values, id: editingPermission.id });
-        message.success('Permission updated successfully');
+        response = await editPermission({ ...values, id: editingPermission.id });
       } else {
-        await addPermission(values);
-        message.success('Permission added successfully');
+        response = await addPermission(values);
       }
-      setModalVisible(false);
-      fetchPermissions(pagination.current, pagination.pageSize, searchText, filters);
+      if (response.data && response.data.code === 200) {
+        message.success(editingPermission ? 'Permission updated successfully' : 'Permission added successfully');
+        setModalVisible(false);
+        fetchPermissions(pagination.current, pagination.pageSize, searchText, filters);
+      } else {
+        message.error('Failed to save permission: ' + (response.data?.message || 'Unknown error'));
+      }
     } catch (error) {
       console.error('Error saving permission:', error);
       message.error('Failed to save permission: ' + error.message);

@@ -95,13 +95,11 @@ export const login = (username, password) => {
     console.log('Generated token:', token);
     return {
       code: 200,
-      data: {
-        token: token,
-        user: {
-          id: user.id,
-          username: user.username,
-          // ... 其他用户信息
-        }
+      token: token,
+      user: {
+        id: user.id,
+        username: user.username,
+        // ... 其他用户信息
       }
     }
   } else {
@@ -147,10 +145,8 @@ export default {
     
     return {
       code: 200,
-      data: {
-        list: pageList,
-        total: mockList.length,
-      }
+      list: pageList,
+      total: mockList.length,
     };
   },
 
@@ -167,7 +163,7 @@ export default {
     List.unshift(newUser);
     return {
       code: 200,
-      data: newUser,
+      user: newUser,
       message: 'User added successfully'
     }
   },
@@ -204,27 +200,68 @@ export default {
 
   // 更新用户
   editUser: config => {
-    const { id, username, status, roleId } = JSON.parse(config.body);
+    console.log('Edit user config:', config);
+    console.log('Config body type:', typeof config.body);
+    console.log('Config body content:', config.body);
+
+    let body;
+    if (config.body === undefined) {
+      console.error('Config body is undefined');
+      return {
+        code: 400,
+        message: 'Request body is missing'
+      };
+    }
+
+    if (typeof config.body === 'string') {
+      try {
+        body = JSON.parse(config.body);
+      } catch (error) {
+        console.error('Error parsing request body:', error);
+        return {
+          code: 400,
+          message: 'Invalid request body'
+        };
+      }
+    } else if (typeof config.body === 'object') {
+      body = config.body;
+    } else {
+      console.error('Unexpected body type:', typeof config.body);
+      return {
+        code: 400,
+        message: 'Invalid request body'
+      };
+    }
+
+    const { id, username, status, roleId } = body;
     console.log('Editing user:', { id, username, status, roleId });
+    
+    if (!id) {
+      return {
+        code: 400,
+        message: 'Missing user ID'
+      };
+    }
+
     const index = List.findIndex(u => u.id === id);
     if (index !== -1) {
       List[index] = {
         ...List[index],
-        username,
-        status,
-        roleId
-      }
+        username: username || List[index].username,
+        status: status || List[index].status,
+        roleId: roleId || List[index].roleId
+      };
       console.log('User updated:', List[index]);
       return {
         code: 200,
-        data: List[index],
+        user: List[index],
         message: 'User updated successfully'
-      }
+      };
     } else {
       return {
         code: 404,
         message: 'User not found'
-      }
+      };
     }
   },
 
