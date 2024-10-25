@@ -160,10 +160,15 @@ export default {
         console.error('Error parsing config.body:', error);
       }
     }
-    const { name = '', page = 1, pageSize = 10 } = params;
+    const { name = '', page = 1, pageSize = 10, type } = params;
 
     const mockList = List.filter(permission => {
-      if (name && permission && permission.name && !permission.name.toLowerCase().includes(name.toLowerCase())) {
+      // 按名称筛选
+      if (name && permission.name && !permission.name.toLowerCase().includes(name.toLowerCase())) {
+        return false;
+      }
+      // 按类型筛选
+      if (type && permission.type !== type) {
         return false;
       }
       return true;

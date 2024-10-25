@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Space, Button, Input, message, Modal, Form, Select, TreeSelect } from 'antd';
+import { Table, Space, Button, Input, message, Modal, Form, Select, TreeSelect, InputNumber } from 'antd';
 import { getPermission, addPermission, editPermission, deletePermission } from '../api';
 
 const { Search } = Input;
@@ -13,11 +13,12 @@ const PermissionManagement = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [editingPermission, setEditingPermission] = useState(null);
   const [form] = Form.useForm();
+  const [filters, setFilters] = useState({});
 
-  const fetchPermissions = async (page = 1, pageSize = 10, name = '') => {
+  const fetchPermissions = async (page = 1, pageSize = 10, name = '', filters = {}) => {
     setLoading(true);
     try {
-      const response = await getPermission({ page, pageSize, name });
+      const response = await getPermission({ page, pageSize, name, ...filters });
       if (response && response.data && Array.isArray(response.data.permissions)) {
         setPermissions(response.data.permissions);
         setPagination(prev => ({
@@ -38,23 +39,24 @@ const PermissionManagement = () => {
   };
 
   useEffect(() => {
-    fetchPermissions();
-  }, []);
+    fetchPermissions(pagination.current, pagination.pageSize, searchText, filters);
+  }, [filters]);
 
-  const handleTableChange = (pagination) => {
-    fetchPermissions(pagination.current, pagination.pageSize, searchText);
+  const handleTableChange = (pagination, filters, sorter) => {
+    const type = filters.type && filters.type.length > 0 ? filters.type[0] : undefined;
+    fetchPermissions(pagination.current, pagination.pageSize, searchText, { type });
   };
 
   const handleSearch = (value) => {
     setSearchText(value);
-    fetchPermissions(1, pagination.pageSize, value);
+    fetchPermissions(1, pagination.pageSize, value, filters);
   };
 
   const handleDelete = async (id) => {
     try {
       await deletePermission({ id });
       message.success('Permission deleted successfully');
-      fetchPermissions(pagination.current, pagination.pageSize, searchText);
+      fetchPermissions(pagination.current, pagination.pageSize, searchText, filters);
     } catch (error) {
       console.error('Error deleting permission:', error);
       message.error('Failed to delete permission: ' + error.message);
@@ -84,7 +86,7 @@ const PermissionManagement = () => {
         message.success('Permission added successfully');
       }
       setModalVisible(false);
-      fetchPermissions(pagination.current, pagination.pageSize, searchText);
+      fetchPermissions(pagination.current, pagination.pageSize, searchText, filters);
     } catch (error) {
       console.error('Error saving permission:', error);
       message.error('Failed to save permission: ' + error.message);
@@ -101,6 +103,7 @@ const PermissionManagement = () => {
       title: 'Name',
       dataIndex: 'name',
       key: 'name',
+      sorter: (a, b) => a.name.localeCompare(b.name),
     },
     {
       title: 'Description',
@@ -111,11 +114,28 @@ const PermissionManagement = () => {
       title: 'Type',
       dataIndex: 'type',
       key: 'type',
+      filters: [
+        { text: 'Menu', value: 'menu' },
+        { text: 'Action', value: 'action' },
+      ],
+      filterMultiple: false,
+      onFilter: (value, record) => record.type === value,
     },
     {
       title: 'URL',
       dataIndex: 'url',
       key: 'url',
+    },
+    {
+      title: 'Parent ID',
+      dataIndex: 'parent_id',
+      key: 'parent_id',
+    },
+    {
+      title: 'Order',
+      dataIndex: 'order_num',
+      key: 'order_num',
+      sorter: (a, b) => a.order_num - b.order_num,
     },
     {
       title: 'Action',
@@ -194,13 +214,15 @@ const PermissionManagement = () => {
               treeData={permissions}
               fieldNames={{ label: 'name', value: 'id', children: 'children' }}
               treeDefaultExpandAll
+              allowClear
             />
           </Form.Item>
           <Form.Item
             name="order_num"
             label="Order Number"
+            rules={[{ type: 'number', min: 0, message: 'Order number must be a non-negative integer!' }]}
           >
-            <Input type="number" />
+            <InputNumber min={0} />
           </Form.Item>
         </Form>
       </Modal>
