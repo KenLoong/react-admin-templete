@@ -55,7 +55,7 @@ Mock.mock('/login', 'post', (options) => {
 })
 
 // 首页相关
-Mock.mock('/home/getData', () => {
+Mock.mock('/home/getData', 'get', () => {
     const authResult = authMiddleware()
     if (authResult) return authResult
     return homeApi.getStatisticalData()
@@ -92,9 +92,57 @@ Mock.mock('/roles/list', 'post', (options) => {
     console.log('Mock /roles/list called with options:', options);
     const authResult = authMiddleware()
     if (authResult) return authResult
-    return roleApi.getRole(options)
+    return roleApi.getRole(JSON.parse(options.body))
 })
 
-// ... 其他角色和权限相关的路由
+Mock.mock('/roles/add', 'post', (options) => {
+    const authResult = authMiddleware()
+    if (authResult) return authResult
+    return roleApi.addRole(JSON.parse(options.body))
+})
+
+Mock.mock('/roles/edit', 'post', (options) => {
+    const authResult = authMiddleware()
+    if (authResult) return authResult
+    return roleApi.editRole(JSON.parse(options.body))
+})
+
+Mock.mock('/roles/delete', 'post', (options) => {
+    const authResult = authMiddleware()
+    if (authResult) return authResult
+    return roleApi.deleteRole(JSON.parse(options.body))
+})
+
+// 权限管理相关
+Mock.mock('/permissions/list', 'post', (options) => {
+    const authResult = authMiddleware()
+    if (authResult) return authResult
+    return permissionApi.getPermission(JSON.parse(options.body))
+})
+
+Mock.mock('/permissions/add', 'post', (options) => {
+    const authResult = authMiddleware()
+    if (authResult) return authResult
+    return permissionApi.addPermission(JSON.parse(options.body))
+})
+
+Mock.mock('/permissions/edit', 'post', (options) => {
+    const authResult = authMiddleware()
+    if (authResult) return authResult
+    return permissionApi.editPermission(JSON.parse(options.body))
+})
+
+Mock.mock('/permissions/delete', 'post', (options) => {
+    const authResult = authMiddleware()
+    if (authResult) return authResult
+    return permissionApi.deletePermission(JSON.parse(options.body))
+})
+
+// 菜单相关
+Mock.mock('/permission/getMenu', 'post', (options) => {
+    const authResult = authMiddleware()
+    if (authResult) return authResult
+    return permissionApi.getMenu(JSON.parse(options.body))
+})
 
 export default Mock

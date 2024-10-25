@@ -51,23 +51,9 @@ for (let i = predefinedRoles.length; i < count; i++) {
 
 export default {
   // 获取角色列表
-  getRole: config => {
-    console.log('Mock getRole called with config:', config);
-    let { body } = config;
+  getRole: body => {
+    console.log('Mock getRole called with body:', body);
     
-    // 确保 body 是一个对象
-    if (typeof body === 'string') {
-      try {
-        body = JSON.parse(body);
-      } catch (error) {
-        console.error('Error parsing request body:', error);
-        body = {};
-      }
-    } else if (typeof body !== 'object') {
-      console.warn('Request body is not an object');
-      body = {};
-    }
-
     const { name = '', page = 1, pageSize = 10 } = body;
 
     const mockList = List.filter(role => {
@@ -87,17 +73,17 @@ export default {
   },
 
   // 添加角色
-  addRole: config => {
-    console.log('Mock addRole called with config:', config);
-    const { name, description, permissionIds } = JSON.parse(config.body)
+  addRole: body => {
+    console.log('Mock addRole called with body:', body);
+    const { name, description, permissions } = body;
     const newRole = {
       id: Mock.Random.guid(),
       name: name,
       description: description,
-      permissions: permissionIds.map(id => {
-        const permission = predefinedPermissions.find(p => p.id === id);
-        return { id, name: permission ? permission.name : `Unknown Permission` };
-      }),
+      permissions: permissions.map(p => ({
+        id: p.id,
+        name: p.name || predefinedPermissions.find(pp => pp.id === p.id)?.name || 'Unknown Permission'
+      })),
       createdAt: Mock.Random.now()
     }
     List.unshift(newRole)
@@ -109,9 +95,9 @@ export default {
   },
 
   // 删除角色
-  deleteRole: config => {
-    console.log('Mock deleteRole called with config:', config);
-    const { id } = JSON.parse(config.body)
+  deleteRole: body => {
+    console.log('Mock deleteRole called with body:', body);
+    const { id } = body;
     if (!id) {
       return {
         code: 400,
@@ -133,30 +119,41 @@ export default {
   },
 
   // 编辑角色
-  editRole: config => {
-    console.log('Mock editRole called with config:', config);
-    const { id, name, description, permissionIds } = JSON.parse(config.body)
-    const index = List.findIndex(u => u.id === id)
+  editRole: body => {
+    console.log('Edit role body:', body);
+
+    const { id, name, description, permissions } = body;
+    console.log('Editing role:', { id, name, description, permissions });
+    
+    if (!id) {
+      return {
+        code: 400,
+        message: 'Missing role ID'
+      };
+    }
+
+    const index = List.findIndex(r => r.id === id);
     if (index !== -1) {
       List[index] = {
         ...List[index],
-        name,
-        description,
-        permissions: permissionIds.map(id => {
-          const permission = predefinedPermissions.find(p => p.id === id);
-          return { id, name: permission ? permission.name : `Unknown Permission` };
-        })
-      }
+        name: name || List[index].name,
+        description: description || List[index].description,
+        permissions: Array.isArray(permissions) ? permissions.map(p => ({
+          id: p.id,
+          name: p.name || predefinedPermissions.find(pp => pp.id === p.id)?.name || 'Unknown Permission'
+        })) : List[index].permissions
+      };
+      console.log('Role updated:', List[index]);
       return {
         code: 200,
         role: List[index],
         message: 'Role updated successfully'
-      }
+      };
     } else {
       return {
         code: 404,
         message: 'Role not found'
-      }
+      };
     }
   }
 }

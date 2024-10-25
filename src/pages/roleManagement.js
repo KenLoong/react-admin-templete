@@ -105,13 +105,15 @@ const RoleManagement = () => {
       let response;
       if (editingRole) {
         response = await editRole({ 
-          ...values, 
           id: editingRole.id,
+          name: values.name,
+          description: values.description,
           permissions: selectedPermissions.map(p => ({ id: p.id, name: p.name }))
         });
       } else {
         response = await addRole({
-          ...values,
+          name: values.name,
+          description: values.description,
           permissions: selectedPermissions.map(p => ({ id: p.id, name: p.name }))
         });
       }

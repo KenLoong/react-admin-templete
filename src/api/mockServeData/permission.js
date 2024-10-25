@@ -76,17 +76,9 @@ let List = [...predefinedPermissions];
 
 export default {
   // 获取权限列表
-  getPermission: config => {
-    console.log('Mock getPermission called with config:', config);
-    let params = {};
-    if (config.body) {
-      try {
-        params = JSON.parse(config.body);
-      } catch (error) {
-        console.error('Error parsing config.body:', error);
-      }
-    }
-    const { name = '', page = 1, pageSize = 10, type } = params;
+  getPermission: body => {
+    console.log('Mock getPermission called with body:', body);
+    const { name = '', page = 1, pageSize = 10, type } = body;
 
     const mockList = List.filter(permission => {
       // 按名称筛选
@@ -110,9 +102,9 @@ export default {
   },
 
   // 添加权限
-  addPermission: config => {
-    console.log('Mock addPermission called with config:', config);
-    const { name, description, type, url, parent_id, order_num } = JSON.parse(config.body);
+  addPermission: body => {
+    console.log('Mock addPermission called with body:', body);
+    const { name, description, type, url, parent_id, order_num } = body;
     const newPermission = {
       id: Mock.Random.guid(),
       name,
@@ -131,9 +123,9 @@ export default {
   },
 
   // 删除权限
-  deletePermission: config => {
-    console.log('Mock deletePermission called with config:', config);
-    const { id } = JSON.parse(config.body);
+  deletePermission: body => {
+    console.log('Mock deletePermission called with body:', body);
+    const { id } = body;
     if (!id) {
       return {
         code: 400,
@@ -155,9 +147,9 @@ export default {
   },
 
   // 编辑权限
-  editPermission: config => {
-    console.log('Mock editPermission called with config:', config);
-    const { id, name, description, type, url, parent_id, order_num } = JSON.parse(config.body);
+  editPermission: body => {
+    console.log('Mock editPermission called with body:', body);
+    const { id, name, description, type, url, parent_id, order_num } = body;
     const index = List.findIndex(u => u.id === id);
     if (index !== -1) {
       List[index] = {
@@ -180,5 +172,17 @@ export default {
         message: 'Permission not found'
       };
     }
+  },
+
+  // 获取菜单
+  getMenu: body => {
+    console.log('Mock getMenu called with body:', body);
+    // 这里可以根据需要实现获取菜单的逻辑
+    // 例如，可以返回所有类型为 'menu' 的权限
+    const menuList = List.filter(permission => permission.type === 'menu');
+    return {
+      code: 200,
+      data: menuList
+    };
   }
 };
