@@ -63,15 +63,17 @@ Mock.mock('/home/getData', 'get', () => {
 
 // 用户管理相关
 Mock.mock('/users/list', 'post', (options) => {
+    console.log('Mock /users/list called with options:', options);
     const authResult = authMiddleware()
     if (authResult) return authResult
     return userApi.getUser(JSON.parse(options.body))
 })
 
 Mock.mock('/users/add', 'post', (options) => {
+    console.log('Mock /users/add called with options:', options);
     const authResult = authMiddleware()
     if (authResult) return authResult
-    return userApi.addUser(JSON.parse(options.body))
+    return userApi.addUser(options.body)  // 直接传递 options.body
 })
 
 Mock.mock('/users/edit', 'post', (options) => {

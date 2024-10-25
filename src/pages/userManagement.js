@@ -16,19 +16,19 @@ const UserManagement = () => {
   const [searchText, setSearchText] = useState('');
   const [deletingId, setDeletingId] = useState(null);
 
-  const fetchUsers = async (page = 1, pageSize = 10, searchText = '') => {
-    console.log('Fetching users with:', { page, pageSize, searchText });
+  const fetchUsers = async (page = 1, pageSize = 10, username = '') => {
+    console.log('Fetching users with:', { page, pageSize, username });
     setLoading(true);
     try {
-      const response = await getUser({ page, pageSize, username: searchText });
+      const response = await getUser({ page, pageSize, username });
       console.log('getUser response:', response);
-      if (response.data && response.data.code === 200 && Array.isArray(response.data.list)) {
+      if (response.data && response.data.code === 200) {
         setUsers(response.data.list);
         setPagination(prev => ({
           ...prev,
           current: page,
           pageSize: pageSize,
-          total: response.data.total || response.data.list.length
+          total: response.data.total
         }));
       } else {
         console.error('Unexpected API response structure:', response);
@@ -76,6 +76,7 @@ const UserManagement = () => {
   };
 
   const handleSearch = (value) => {
+    console.log('Searching for:', value);
     setSearchText(value);
     fetchUsers(1, pagination.pageSize, value);
   };
@@ -101,7 +102,7 @@ const UserManagement = () => {
     try {
       setDeletingId(id);
       console.log('Deleting user with id:', id);
-      const response = await deleteUser({ id });
+      const response = await deleteUser({ id });  // 传递一个对象，而不是直接传递 id
       console.log('Delete response:', response);
       if (response.data && response.data.code === 200) {
         message.success('User deleted successfully');
@@ -121,32 +122,26 @@ const UserManagement = () => {
   const handleModalOk = async () => {
     try {
       const values = await form.validateFields();
-      console.log('Form values:', values);
+      let response;
       if (editingUserId) {
-        const editParams = { id: editingUserId, ...values };
-        console.log('Editing user with params:', editParams);
-        const response = await editUser(editParams);
-        console.log('Edit user response:', response);
-        if (response.data && response.data.code === 200) {
-          message.success('User updated successfully');
-          setModalVisible(false);
-          fetchUsers(pagination.current, pagination.pageSize, searchText);
-        } else {
-          message.error('Failed to update user: ' + (response.data?.message || 'Unknown error'));
-        }
+        response = await editUser({ 
+          id: editingUserId,
+          ...values
+        });
       } else {
-        const response = await addUser(values);
-        if (response.data && response.data.code === 200) {
-          message.success('User added successfully');
-          setModalVisible(false);
-          fetchUsers(pagination.current, pagination.pageSize, searchText);
-        } else {
-          message.error('Failed to add user: ' + (response.data?.message || 'Unknown error'));
-        }
+        response = await addUser(values);
+      }
+      if (response.data && response.data.code === 200) {
+        message.success(editingUserId ? 'User updated successfully' : 'User added successfully');
+        setModalVisible(false);
+        form.resetFields();
+        fetchUsers(pagination.current, pagination.pageSize, searchText);
+      } else {
+        message.error('Failed to save user: ' + (response.data?.message || 'Unknown error'));
       }
     } catch (error) {
-      console.error('Error in handleModalOk:', error);
-      message.error('Operation failed: ' + error.message);
+      console.error('Error saving user:', error);
+      message.error('Failed to save user: ' + error.message);
     }
   };
 

@@ -114,22 +114,20 @@ export default {
   // 获取用户列表
   getUser: config => {
     console.log('Mock getUser called with config:', config);
-    let { body } = config;
+    let { username, page = 1, pageSize = 10 } = config;
     
-    // 确保 body 是一个有效的 JSON 字符串
-    if (typeof body === 'string' && body.trim() !== '') {
+    // 确保 config 是一个对象
+    if (typeof config === 'string') {
       try {
-        body = JSON.parse(body);
+        config = JSON.parse(config);
+        username = config.username;
+        page = config.page || 1;
+        pageSize = config.pageSize || 10;
       } catch (error) {
-        console.error('Error parsing request body:', error);
-        body = {};
+        console.error('Error parsing config:', error);
       }
-    } else {
-      console.warn('Request body is empty or not a string');
-      body = {};
     }
 
-    const { username, page = 1, pageSize = 10 } = body;
     console.log('Parsed parameters:', { username, page, pageSize });
     
     const mockList = List.filter(user => {
@@ -137,8 +135,9 @@ export default {
         return false;
       }
       return true;
-    })
-    const pageList = mockList.filter((item, index) => index < pageSize * page && index >= pageSize * (page - 1))
+    });
+
+    const pageList = mockList.filter((item, index) => index < pageSize * page && index >= pageSize * (page - 1));
     
     console.log('Filtered mockList:', mockList);
     console.log('Page list:', pageList);
@@ -152,50 +151,103 @@ export default {
 
   // 添加用户
   addUser: config => {
-    const { username, status, roleId } = JSON.parse(config.body);
+    console.log('Add user config:', config);
+    let body;
+    if (typeof config === 'string') {
+      try {
+        body = JSON.parse(config);
+      } catch (error) {
+        console.error('Error parsing request body:', error);
+        return {
+          code: 400,
+          message: 'Invalid request body'
+        };
+      }
+    } else if (typeof config === 'object') {
+      body = config;
+    } else {
+      console.error('Unexpected config type:', typeof config);
+      return {
+        code: 400,
+        message: 'Invalid request body'
+      };
+    }
+
+    const { username, password, status, roleId } = body;
+
+    if (!username || !password || !status || !roleId) {
+      return {
+        code: 400,
+        message: 'Missing required fields'
+      };
+    }
+
     const newUser = {
       id: Mock.Random.guid(),
       username,
+      password,
       status,
       roleId,
       createdAt: Mock.Random.now()
     };
+
     List.unshift(newUser);
     return {
       code: 200,
-      user: newUser,
+      data: newUser,
       message: 'User added successfully'
-    }
+    };
   },
 
   // 删除用户
   deleteUser: config => {
     console.log('Mock deleteUser called with config:', config);
-    const { id } = JSON.parse(config.body);
+    let id;
+    
+    if (typeof config === 'string') {
+      try {
+        const parsedConfig = JSON.parse(config);
+        id = parsedConfig.id;
+      } catch (error) {
+        console.error('Error parsing config:', error);
+        return {
+            code: 400,
+            message: 'Invalid request body'
+        };
+      }
+    } else if (typeof config === 'object') {
+      id = config.id;
+    } else {
+      console.error('Unexpected config type:', typeof config);
+      return {
+          code: 400,
+          message: 'Invalid request body'
+      };
+    }
 
     if (!id) {
       console.log('Invalid parameters: Missing user ID');
       return {
-        code: 400,
-        message: 'Invalid parameters: Missing user ID'
-      }
+          code: 400,
+          message: 'Invalid parameters: Missing user ID'
+      };
     }
 
     const index = List.findIndex(u => u.id === id);
     if (index === -1) {
       console.log('User not found');
       return {
-        code: 404,
-        message: 'User not found'
-      }
+          code: 404,
+          message: 'User not found'
+      };
     }
 
     List.splice(index, 1);
     console.log('User deleted successfully');
     return {
-      code: 200,
-      message: 'User deleted successfully'
-    }
+        code: 200,
+        message: 'User deleted successfully'
+    };
   },
 
   // 更新用户
