@@ -19,20 +19,22 @@ const RoleManagement = () => {
     setLoading(true);
     try {
       const response = await getRole({ page, pageSize, name });
-      if (response && response.data && Array.isArray(response.data.roles)) {
-        setRoles(response.data.roles);
+      console.log('getRole response:', response);
+      if (response && response.code === 200 && Array.isArray(response.roles)) {
+        setRoles(response.roles);
         setPagination({
           ...pagination,
           current: page,
           pageSize: pageSize,
-          total: response.data.total || response.data.roles.length
+          total: response.total || response.roles.length
         });
       } else {
         console.error('Unexpected API response structure:', response);
+        message.error('Failed to fetch roles: Unexpected response structure');
       }
     } catch (error) {
       console.error('Error fetching roles:', error);
-      message.error('Failed to fetch roles: ' + error.message);
+      message.error('Failed to fetch roles: ' + (error.message || 'Unknown error'));
     }
     setLoading(false);
   };

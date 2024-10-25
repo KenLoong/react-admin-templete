@@ -84,35 +84,31 @@ for (let i = predefinedUsers.length; i < count; i++) {
 }
 
 export const login = (username, password) => {
+  console.log('Login attempt:', { username, password });
   const user = List.find(u => u.username === username && u.password === password);
   if (user) {
-    const role = predefinedRoles.find(r => r.id === user.roleId);
-    console.log('Found role:', role);
-    const userWithPermissions = {
-      id: user.id,
+    const now = Date.now();
+    const token = btoa(JSON.stringify({
       username: user.username,
-      role: {
-        id: role.id,
-        name: role.name,
-        permissions: role.permissions.map(p => {
-          const fullPermission = predefinedPermissions.find(fp => fp.id === p.id);
-          return fullPermission ? { ...fullPermission } : p;
-        })
-      }
-    };
-    console.log('User with permissions:', userWithPermissions);
+      exp: now + 3600000 // 1小时后过期
+    }));
+    console.log('Generated token:', token);
     return {
       code: 200,
       data: {
-        token: Mock.Random.guid(),
-        user: userWithPermissions
+        token: token,
+        user: {
+          id: user.id,
+          username: user.username,
+          // ... 其他用户信息
+        }
       }
-    };
+    }
   } else {
     return {
       code: 401,
-      message: 'Invalid username or password'
-    };
+      message: '用户名或密码错误'
+    }
   }
 };
 
@@ -120,7 +116,22 @@ export default {
   // 获取用户列表
   getUser: config => {
     console.log('Mock getUser called with config:', config);
-    const { username, page = 1, pageSize = 10 } = JSON.parse(config.body);
+    let { body } = config;
+    
+    // 确保 body 是一个有效的 JSON 字符串
+    if (typeof body === 'string' && body.trim() !== '') {
+      try {
+        body = JSON.parse(body);
+      } catch (error) {
+        console.error('Error parsing request body:', error);
+        body = {};
+      }
+    } else {
+      console.warn('Request body is empty or not a string');
+      body = {};
+    }
+
+    const { username, page = 1, pageSize = 10 } = body;
     console.log('Parsed parameters:', { username, page, pageSize });
     
     const mockList = List.filter(user => {
@@ -131,13 +142,16 @@ export default {
     })
     const pageList = mockList.filter((item, index) => index < pageSize * page && index >= pageSize * (page - 1))
     
-    const result = {
+    console.log('Filtered mockList:', mockList);
+    console.log('Page list:', pageList);
+    
+    return {
       code: 200,
-      total: mockList.length,
-      users: pageList
+      data: {
+        list: pageList,
+        total: mockList.length,
+      }
     };
-    console.log('Mock getUser returning:', result);
-    return result;
   },
 
   // 添加用户

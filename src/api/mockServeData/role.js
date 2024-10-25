@@ -53,7 +53,22 @@ export default {
   // 获取角色列表
   getRole: config => {
     console.log('Mock getRole called with config:', config);
-    const { name = '', page = 1, pageSize = 10 } = JSON.parse(config.body);
+    let { body } = config;
+    
+    // 确保 body 是一个对象
+    if (typeof body === 'string') {
+      try {
+        body = JSON.parse(body);
+      } catch (error) {
+        console.error('Error parsing request body:', error);
+        body = {};
+      }
+    } else if (typeof body !== 'object') {
+      console.warn('Request body is not an object');
+      body = {};
+    }
+
+    const { name = '', page = 1, pageSize = 10 } = body;
 
     const mockList = List.filter(role => {
       if (name && !role.name.toLowerCase().includes(name.toLowerCase())) {

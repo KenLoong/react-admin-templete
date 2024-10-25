@@ -9,32 +9,29 @@ const Login = () => {
   if (localStorage.getItem('token')) {
     return <Navigate to="/home" replace />
   }
-  const handleSubmit = async (values) => {
-    if (!values.password || !values.username) {
-      return message.warning('请输入用户名和密码');
-    }
+  const handleLogin = async (values) => {
     try {
-      console.log('Attempting login with:', values);
-      const response = await login(values);
+      console.log('Login attempt with values:', values);
+      const response = await login(values.username, values.password);
       console.log('Login response:', response);
       if (response.code === 200 && response.data && response.data.token) {
         localStorage.setItem('token', response.data.token);
-        localStorage.setItem('user', JSON.stringify(response.data.user));
-        console.log('User data stored in localStorage:', response.data.user);
+        console.log('Token stored in localStorage:', response.data.token);
         message.success('登录成功');
         navigate('/home');
       } else {
-        message.error('登录失败：' + (response.message || '未知错误'));
+        console.error('Unexpected login response:', response);
+        message.error(response.message || '登录失败');
       }
     } catch (error) {
       console.error('Login error:', error);
-      message.error('登录失败：' + (error.message || '未知错误'));
+      message.error('登录失败: ' + (error.message || '未知错误'));
     }
-  }
+  };
   return (
     <Form
       className="login-container"
-      onFinish={handleSubmit}
+      onFinish={handleLogin}
     >
       <div className="login_title">系统登录</div>
       <Form.Item

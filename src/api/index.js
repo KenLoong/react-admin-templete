@@ -2,35 +2,28 @@ import axios from './axios'
 
 // 用户管理相关的 API
 export const getUser = (params) => {
-  return axios.request({
-    url: '/users/list',
-    method: 'post',
-    data: params
-  })
+  console.log('Calling getUser API with params:', params);
+  return axios.post('/users/list', params)
+    .then(response => {
+      console.log('getUser API response:', response);
+      return response;
+    })
+    .catch(error => {
+      console.error('getUser API error:', error);
+      throw error;
+    });
 }
 
 export const addUser = (data) => {
-  return axios.request({
-    url: '/users/add',
-    method: 'post',
-    data
-  })
+  return axios.post('/users/add', data)
 }
 
 export const editUser = (data) => {
-  return axios.request({
-    url: '/users/edit',
-    method: 'post',
-    data
-  })
+  return axios.post('/users/edit', data)
 }
 
-export const deleteUser = (params) => {
-  return axios.request({
-    url: '/users/delete',
-    method: 'post',
-    data: params
-  })
+export const deleteUser = (data) => {
+  return axios.post('/users/delete', data)
 }
 
 // 角色管理相关的 API
@@ -100,12 +93,17 @@ export const deletePermission = (params) => {
 }
 
 // 登录 API
-export const login = (data) => {
-  return axios.request({
-    url: '/login',
-    method: 'post',
-    data
-  })
+export const login = (username, password) => {
+  console.log('Calling login API with:', { username, password });
+  return axios.post('/login', { username, password })
+    .then(response => {
+      console.log('Login API response:', response);
+      return response;
+    })
+    .catch(error => {
+      console.error('Login API error:', error);
+      throw error;
+    });
 }
 
 // 从 old-index.js 合并的 API

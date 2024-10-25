@@ -17,24 +17,26 @@ const UserManagement = () => {
   const [deletingId, setDeletingId] = useState(null);
 
   const fetchUsers = async (page = 1, pageSize = 10, searchText = '') => {
+    console.log('Fetching users with:', { page, pageSize, searchText });
     setLoading(true);
     try {
       const response = await getUser({ page, pageSize, username: searchText });
-      if (response && response.data && Array.isArray(response.data.users)) {
-        console.log('Fetched users:', response.data.users);
-        setUsers(response.data.users);
+      console.log('getUser response:', response);
+      if (response.code === 200 && response.data && Array.isArray(response.data.list)) {
+        setUsers(response.data.list);
         setPagination(prev => ({
           ...prev,
           current: page,
           pageSize: pageSize,
-          total: response.data.total || response.data.users.length
+          total: response.data.total || response.data.list.length
         }));
       } else {
         console.error('Unexpected API response structure:', response);
+        message.error('获取用户列表失败：意外的响应结构');
       }
     } catch (error) {
       console.error('Error fetching users:', error);
-      message.error('Failed to fetch users: ' + error.message);
+      message.error('获取用户列表失败：' + (error.message || '未知错误'));
     }
     setLoading(false);
   };
