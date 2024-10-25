@@ -202,34 +202,43 @@ export default {
   // 删除用户
   deleteUser: config => {
     console.log('Mock deleteUser called with config:', config);
-    let id;
-    
-    if (typeof config === 'string') {
-      try {
-        const parsedConfig = JSON.parse(config);
-        id = parsedConfig.id;
-      } catch (error) {
-        console.error('Error parsing config:', error);
-        return {
-            code: 400,
-            message: 'Invalid request body'
-        };
-      }
-    } else if (typeof config === 'object') {
-      id = config.id;
-    } else {
-      console.error('Unexpected config type:', typeof config);
+    let body;
+
+    if (config.body === undefined) {
+      console.error('Config body is undefined');
       return {
-          code: 400,
-          message: 'Invalid request body'
+        code: 400,
+        message: 'Request body is missing'
       };
     }
+
+    if (typeof config.body === 'string') {
+      try {
+        body = JSON.parse(config.body);
+      } catch (error) {
+        console.error('Error parsing request body:', error);
+        return {
+          code: 400,
+          message: 'Invalid request body'
+        };
+      }
+    } else if (typeof config.body === 'object') {
+      body = config.body;
+    } else {
+      console.error('Unexpected body type:', typeof config.body);
+      return {
+        code: 400,
+        message: 'Invalid request body'
+      };
+    }
+
+    const { id } = body;
 
     if (!id) {
       console.log('Invalid parameters: Missing user ID');
       return {
-          code: 400,
-          message: 'Invalid parameters: Missing user ID'
+        code: 400,
+        message: 'Invalid parameters: Missing user ID'
       };
     }
 
@@ -237,16 +246,16 @@ export default {
     if (index === -1) {
       console.log('User not found');
       return {
-          code: 404,
-          message: 'User not found'
+        code: 404,
+        message: 'User not found'
       };
     }
 
     List.splice(index, 1);
     console.log('User deleted successfully');
     return {
-        code: 200,
-        message: 'User deleted successfully'
+      code: 200,
+      message: 'User deleted successfully'
     };
   },
 
