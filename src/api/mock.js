@@ -86,7 +86,7 @@ Mock.mock('/users/edit', 'post', (options) => {
 Mock.mock('/users/delete', 'post', (options) => {
     const authResult = authMiddleware()
     if (authResult) return authResult
-    return userApi.deleteUser(JSON.parse(options.body))
+    return userApi.deleteUser(options)  // 直接传递 options，而不是尝试解析 body
 })
 
 // 角色管理相关
