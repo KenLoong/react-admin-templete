@@ -1,4 +1,5 @@
 import Mock from 'mockjs'
+import { predefinedPermissions } from './permission'  // 假设我们从 permission.js 导入了预定义的权限列表
 
 // 预定义的角色列表
 const predefinedRoles = [
@@ -38,6 +39,7 @@ for (let i = predefinedRoles.length; i < count; i++) {
       id: Mock.Random.guid(),
       name: `Role ${i + 1}`,
       description: Mock.Random.sentence(10, 20),
+      permissions: Mock.Random.shuffle(predefinedPermissions).slice(0, Mock.Random.integer(1, 5)).map(p => ({ id: p.id, name: p.name })),
       createdAt: Mock.Random.datetime()
     })
   )
@@ -75,7 +77,10 @@ export default {
       id: Mock.Random.guid(),
       name: name,
       description: description,
-      permissions: permissionIds.map(id => ({ id, name: `Permission ${id}` })),
+      permissions: permissionIds.map(id => {
+        const permission = predefinedPermissions.find(p => p.id === id);
+        return { id, name: permission ? permission.name : `Unknown Permission` };
+      }),
       createdAt: Mock.Random.now()
     }
     List.unshift(newRole)
@@ -119,7 +124,10 @@ export default {
         ...List[index],
         name,
         description,
-        permissions: permissionIds.map(id => ({ id, name: `Permission ${id}` }))
+        permissions: permissionIds.map(id => {
+          const permission = predefinedPermissions.find(p => p.id === id);
+          return { id, name: permission ? permission.name : `Unknown Permission` };
+        })
       }
       return {
         code: 200,

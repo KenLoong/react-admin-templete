@@ -1,7 +1,7 @@
 import Mock from 'mockjs'
 
 // Generate mock permission data
-let List = [
+export const predefinedPermissions = [
   {
     id: '1',
     name: 'System Management',
@@ -147,6 +147,8 @@ let List = [
     order_num: 4
   }
 ];
+
+let List = [...predefinedPermissions];
 
 export default {
   // 获取权限列表

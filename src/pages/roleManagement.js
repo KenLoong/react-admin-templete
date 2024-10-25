@@ -95,11 +95,19 @@ const RoleManagement = () => {
   const handleModalOk = async () => {
     try {
       const values = await form.validateFields();
+      const selectedPermissions = permissions.filter(p => values.permissionIds.includes(p.id));
       if (editingRole) {
-        await editRole({ ...values, id: editingRole.id });
+        await editRole({ 
+          ...values, 
+          id: editingRole.id,
+          permissions: selectedPermissions.map(p => ({ id: p.id, name: p.name }))
+        });
         message.success('Role updated successfully');
       } else {
-        await addRole(values);
+        await addRole({
+          ...values,
+          permissions: selectedPermissions.map(p => ({ id: p.id, name: p.name }))
+        });
         message.success('Role added successfully');
       }
       setModalVisible(false);
@@ -140,7 +148,7 @@ const RoleManagement = () => {
         <>
           {permissions && permissions.map(perm => (
             <Tag color="blue" key={perm.id}>
-              {perm.name}
+              {`${perm.name} (${perm.id})`}
             </Tag>
           ))}
         </>
@@ -206,7 +214,7 @@ const RoleManagement = () => {
           >
             <Select mode="multiple" placeholder="Select permissions">
               {permissions.map(permission => (
-                <Option key={permission.id} value={permission.id}>{permission.name}</Option>
+                <Option key={permission.id} value={permission.id}>{`${permission.name} (${permission.id})`}</Option>
               ))}
             </Select>
           </Form.Item>
