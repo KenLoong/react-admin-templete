@@ -2,29 +2,33 @@ import Mock from 'mockjs'
 import { predefinedPermissions } from './permission'  // 假设我们从 permission.js 导入了预定义的权限列表
 
 // 预定义的角色列表
-const predefinedRoles = [
+export const predefinedRoles = [
   {
     id: '1',
-    name: 'Admin',
+    name: 'Super Admin',
     description: 'Full access to all features',
+    permissions: predefinedPermissions.map(p => ({ id: p.id, name: p.name })),
     createdAt: '2023-01-01T00:00:00Z'
   },
   {
     id: '2',
-    name: 'Manager',
-    description: 'Access to most features, excluding system settings',
+    name: 'Admin',
+    description: 'Access to most features, including system settings',
+    permissions: predefinedPermissions.map(p => ({ id: p.id, name: p.name })), // 给予所有权限
     createdAt: '2023-01-02T00:00:00Z'
   },
   {
     id: '3',
-    name: 'User',
-    description: 'Basic access to the system',
+    name: 'User Manager',
+    description: 'Access to user management features',
+    permissions: predefinedPermissions.filter(p => p.id === '1' || p.id === '2' || p.id === '5' || p.id === '6').map(p => ({ id: p.id, name: p.name })),
     createdAt: '2023-01-03T00:00:00Z'
   },
   {
     id: '4',
-    name: 'Guest',
-    description: 'Limited access to view-only features',
+    name: 'Regular User',
+    description: 'Basic access to the system',
+    permissions: predefinedPermissions.filter(p => p.id === '1').map(p => ({ id: p.id, name: p.name })),
     createdAt: '2023-01-04T00:00:00Z'
   }
 ];
@@ -44,8 +48,6 @@ for (let i = predefinedRoles.length; i < count; i++) {
     })
   )
 }
-
-export { predefinedRoles };
 
 export default {
   // 获取角色列表

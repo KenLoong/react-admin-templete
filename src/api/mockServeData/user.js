@@ -1,5 +1,6 @@
 import Mock from 'mockjs'
 import { predefinedRoles } from './role'
+import { predefinedPermissions } from './permission'
 
 function param2Obj(url, type, body) {
   const [path, query] = url.split('?');
@@ -29,21 +30,91 @@ function param2Obj(url, type, body) {
   return params;
 }
 
-// 生成模拟用户数据
-let List = []
-const count = 100
+// 预定义用户
+const predefinedUsers = [
+  {
+    id: '1',
+    username: 'superadmin',
+    password: '123456', // 在实际应用中，密码应该被加密存储
+    status: 'active',
+    roleId: '1', // Super Admin
+    createdAt: '2023-01-01T00:00:00Z'
+  },
+  {
+    id: '2',
+    username: 'admin',
+    password: '123456',
+    status: 'active',
+    roleId: '2', // Admin
+    createdAt: '2023-01-02T00:00:00Z'
+  },
+  {
+    id: '3',
+    username: 'manager',
+    password: '123456',
+    status: 'active',
+    roleId: '3', // User Manager
+    createdAt: '2023-01-03T00:00:00Z'
+  },
+  {
+    id: '4',
+    username: 'user',
+    password: '123456',
+    status: 'active',
+    roleId: '4', // Regular User
+    createdAt: '2023-01-04T00:00:00Z'
+  }
+];
 
-for (let i = 0; i < count; i++) {
+// 生成模拟用户数据，包括预定义用户
+let List = [...predefinedUsers];
+const count = 20;
+
+for (let i = predefinedUsers.length; i < count; i++) {
   List.push(
     Mock.mock({
       id: Mock.Random.guid(),
       username: Mock.Random.word(5, 10),
+      password: Mock.Random.string('lower', 8, 8),
       'status|1': ['active', 'inactive'],
       roleId: () => predefinedRoles[Mock.Random.integer(0, predefinedRoles.length - 1)].id,
       createdAt: Mock.Random.datetime()
     })
   )
 }
+
+export const login = (username, password) => {
+  const user = List.find(u => u.username === username && u.password === password);
+  if (user) {
+    const role = predefinedRoles.find(r => r.id === user.roleId);
+    console.log('Found role:', role);
+    const userWithPermissions = {
+      id: user.id,
+      username: user.username,
+      role: {
+        id: role.id,
+        name: role.name,
+        permissions: role.permissions.map(p => {
+          const fullPermission = predefinedPermissions.find(fp => fp.id === p.id);
+          return fullPermission ? { ...fullPermission } : p;
+        })
+      }
+    };
+    console.log('User with permissions:', userWithPermissions);
+    return {
+      code: 200,
+      data: {
+        token: Mock.Random.guid(),
+        user: userWithPermissions
+      }
+    };
+  } else {
+    return {
+      code: 401,
+      message: 'Invalid username or password'
+    };
+  }
+};
 
 export default {
   // 获取用户列表
@@ -141,5 +212,7 @@ export default {
         message: 'User not found'
       }
     }
-  }
+  },
+
+  login
 }

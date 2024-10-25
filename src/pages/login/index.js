@@ -18,9 +18,11 @@ const Login = () => {
       const response = await login(values);
       console.log('Login response:', response);
       if (response.code === 200 && response.data && response.data.token) {
-        localStorage.setItem('token', response.data.token)
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('user', JSON.stringify(response.data.user));
+        console.log('User data stored in localStorage:', response.data.user);
         message.success('登录成功');
-        navigate('/home')
+        navigate('/home');
       } else {
         message.error('登录失败：' + (response.message || '未知错误'));
       }

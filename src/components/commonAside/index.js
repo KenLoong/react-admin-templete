@@ -4,7 +4,6 @@ import * as Icon from "@ant-design/icons"
 import { useNavigate } from 'react-router-dom'
 import { useDispatch } from "react-redux"
 import { selectMenuList } from '../../store/reducers/tab'
-import { getPermission } from '../../api'
 
 const { Sider } = Layout
 const { SubMenu } = Menu
@@ -17,44 +16,35 @@ const CommonAside = ({ collapsed }) => {
   const [menuItems, setMenuItems] = useState([])
 
   useEffect(() => {
-    const fetchPermissions = async () => {
-      try {
-        const response = await getPermission({ page: 1, pageSize: 1000 });
-        if (response && response.data && Array.isArray(response.data.permissions)) {
-          const permissions = response.data.permissions;
-          const systemManagement = permissions.find(item => item.name === 'System Management');
-          
-          if (systemManagement) {
-            const menuData = [
-              // 固定的 Home 菜单项
-              {
-                key: '/home',
-                icon: iconToElement('HomeOutlined'),
-                label: 'Home',
-              },
-              // System Management 及其子菜单
-              {
-                key: systemManagement.url,
-                icon: iconToElement(systemManagement.icon || 'AppstoreOutlined'),
-                label: systemManagement.name,
-                children: permissions
-                  .filter(item => item.parent_id === systemManagement.id && item.type === 'menu')
-                  .map(item => ({
-                    key: item.url,
-                    icon: iconToElement(item.icon || 'AppstoreOutlined'),
-                    label: item.name,
-                  }))
-              }
-            ];
-            setMenuItems(menuData);
-          }
-        }
-      } catch (error) {
-        console.error('Error fetching permissions:', error);
-      }
-    };
+    console.log('CommonAside useEffect triggered');
+    const userString = localStorage.getItem('user');
+    console.log('User string from localStorage:', userString);
+    if (userString) {
+      const user = JSON.parse(userString);
+      console.log('Parsed user data:', user);
 
-    fetchPermissions();
+      if (user && user.role && user.role.permissions) {
+        const menuData = user.role.permissions
+          .filter(permission => permission.type === 'menu')
+          .map(permission => ({
+            key: permission.url,
+            icon: iconToElement(permission.icon || 'AppstoreOutlined'),
+            label: permission.name,
+          }));
+        
+        // 如果菜单中没有 Home 项，则添加一个
+        if (!menuData.some(item => item.key === '/home')) {
+          menuData.unshift({
+            key: '/home',
+            icon: iconToElement('HomeOutlined'),
+            label: 'Home',
+          });
+        }
+        
+        console.log('Generated menu data:', menuData);
+        setMenuItems(menuData);
+      }
+    }
   }, []);
 
   const setTabsList = (val) => {

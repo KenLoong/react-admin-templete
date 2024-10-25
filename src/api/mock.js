@@ -38,23 +38,8 @@ const verifyToken = (token) => {
 
 // 模拟登录接口
 Mock.mock('/login', 'post', (options) => {
-    console.log('Mock login called with options:', options);
     const { username, password } = JSON.parse(options.body);
-    if (username === 'admin' && password === 'password') {
-        return {
-            code: 200,
-            data: {
-                token: 'mock-token-' + Mock.Random.guid(),
-                username: username
-            },
-            message: '登录成功'
-        }
-    } else {
-        return {
-            code: 401,
-            message: '用户名或密码错误'
-        }
-    }
+    return userApi.login(username, password);
 })
 
 // 验证 token 的中间件

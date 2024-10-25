@@ -4,148 +4,72 @@ import Mock from 'mockjs'
 export const predefinedPermissions = [
   {
     id: '1',
-    name: 'System Management',
-    description: 'Permissions related to system management',
+    name: 'Home',
+    description: 'Access to home page',
     type: 'menu',
-    url: '/',
+    url: '/home',
     parent_id: null,
-    order_num: 1
+    order_num: 1,
+    icon: 'HomeOutlined'
   },
   {
     id: '2',
     name: 'User Management',
-    description: 'Permissions related to user management',
+    description: 'Access to user management',
     type: 'menu',
     url: '/users',
-    parent_id: '1',
-    order_num: 1
+    parent_id: null,
+    order_num: 2,
+    icon: 'UserOutlined'
   },
   {
     id: '3',
     name: 'Role Management',
-    description: 'Permissions related to role management',
+    description: 'Access to role management',
     type: 'menu',
     url: '/roles',
-    parent_id: '1',
-    order_num: 2
+    parent_id: null,
+    order_num: 3,
+    icon: 'TeamOutlined'
   },
   {
     id: '4',
     name: 'Permission Management',
-    description: 'Permissions related to permission management',
+    description: 'Access to permission management',
     type: 'menu',
     url: '/permissions',
-    parent_id: '1',
-    order_num: 3
+    parent_id: null,
+    order_num: 4,
+    icon: 'SafetyOutlined'
   },
   {
     id: '5',
-    name: 'View Users',
-    description: 'Permission to view user list',
+    name: 'Create User',
+    description: 'Ability to create new users',
     type: 'action',
-    url: '/api/users',
+    url: '/api/users/create',
     parent_id: '2',
     order_num: 1
   },
   {
     id: '6',
-    name: 'Create User',
-    description: 'Permission to create new user',
+    name: 'Edit User',
+    description: 'Ability to edit existing users',
     type: 'action',
-    url: '/api/users/create',
+    url: '/api/users/edit',
     parent_id: '2',
     order_num: 2
   },
   {
     id: '7',
-    name: 'Edit User',
-    description: 'Permission to edit user information',
-    type: 'action',
-    url: '/api/users/edit',
-    parent_id: '2',
-    order_num: 3
-  },
-  {
-    id: '8',
     name: 'Delete User',
-    description: 'Permission to delete user',
+    description: 'Ability to delete users',
     type: 'action',
     url: '/api/users/delete',
     parent_id: '2',
-    order_num: 4
-  },
-  {
-    id: '9',
-    name: 'View Roles',
-    description: 'Permission to view role list',
-    type: 'action',
-    url: '/api/roles',
-    parent_id: '3',
-    order_num: 1
-  },
-  {
-    id: '10',
-    name: 'Create Role',
-    description: 'Permission to create new role',
-    type: 'action',
-    url: '/api/roles/create',
-    parent_id: '3',
-    order_num: 2
-  },
-  {
-    id: '11',
-    name: 'Edit Role',
-    description: 'Permission to edit role information',
-    type: 'action',
-    url: '/api/roles/edit',
-    parent_id: '3',
     order_num: 3
   },
-  {
-    id: '12',
-    name: 'Delete Role',
-    description: 'Permission to delete role',
-    type: 'action',
-    url: '/api/roles/delete',
-    parent_id: '3',
-    order_num: 4
-  },
-  {
-    id: '13',
-    name: 'View Permissions',
-    description: 'Permission to view permission list',
-    type: 'action',
-    url: '/api/permissions',
-    parent_id: '4',
-    order_num: 1
-  },
-  {
-    id: '14',
-    name: 'Create Permission',
-    description: 'Permission to create new permission',
-    type: 'action',
-    url: '/api/permissions/create',
-    parent_id: '4',
-    order_num: 2
-  },
-  {
-    id: '15',
-    name: 'Edit Permission',
-    description: 'Permission to edit permission information',
-    type: 'action',
-    url: '/api/permissions/edit',
-    parent_id: '4',
-    order_num: 3
-  },
-  {
-    id: '16',
-    name: 'Delete Permission',
-    description: 'Permission to delete permission',
-    type: 'action',
-    url: '/api/permissions/delete',
-    parent_id: '4',
-    order_num: 4
-  }
+  // ... 添加更多权限 ...
 ];
 
 let List = [...predefinedPermissions];
