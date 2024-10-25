@@ -1,4 +1,5 @@
 import Mock from 'mockjs'
+import { predefinedRoles } from './role'
 
 function param2Obj(url, type, body) {
   const [path, query] = url.split('?');
@@ -38,6 +39,7 @@ for (let i = 0; i < count; i++) {
       id: Mock.Random.guid(),
       username: Mock.Random.word(5, 10),
       'status|1': ['active', 'inactive'],
+      roleId: () => predefinedRoles[Mock.Random.integer(0, predefinedRoles.length - 1)].id,
       createdAt: Mock.Random.datetime()
     })
   )
@@ -69,15 +71,18 @@ export default {
 
   // 添加用户
   addUser: config => {
-    const { username, status } = JSON.parse(config.body);
-    List.unshift({
+    const { username, status, roleId } = JSON.parse(config.body);
+    const newUser = {
       id: Mock.Random.guid(),
-      username: username,
-      status: status,
+      username,
+      status,
+      roleId,
       createdAt: Mock.Random.now()
-    })
+    };
+    List.unshift(newUser);
     return {
       code: 200,
+      data: newUser,
       message: 'User added successfully'
     }
   },
@@ -114,16 +119,20 @@ export default {
 
   // 更新用户
   editUser: config => {
-    const { id, username, status } = JSON.parse(config.body);
+    const { id, username, status, roleId } = JSON.parse(config.body);
+    console.log('Editing user:', { id, username, status, roleId });
     const index = List.findIndex(u => u.id === id);
     if (index !== -1) {
       List[index] = {
         ...List[index],
         username,
-        status
+        status,
+        roleId
       }
+      console.log('User updated:', List[index]);
       return {
         code: 200,
+        data: List[index],
         message: 'User updated successfully'
       }
     } else {

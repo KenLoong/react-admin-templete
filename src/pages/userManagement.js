@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Space, Button, Input, Modal, Form, message, Popconfirm, Select } from 'antd';
-import { getUser, addUser, editUser, deleteUser } from '../api';
+import { getUser, addUser, editUser, deleteUser, getRole } from '../api';
 
 const { Search } = Input;
 const { Option } = Select;
 
 const UserManagement = () => {
   const [users, setUsers] = useState([]);
+  const [roles, setRoles] = useState([]);
   const [loading, setLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [form] = Form.useForm();
@@ -20,6 +21,7 @@ const UserManagement = () => {
     try {
       const response = await getUser({ page, pageSize, username: searchText });
       if (response && response.data && Array.isArray(response.data.users)) {
+        console.log('Fetched users:', response.data.users);
         setUsers(response.data.users);
         setPagination(prev => ({
           ...prev,
@@ -37,9 +39,28 @@ const UserManagement = () => {
     setLoading(false);
   };
 
+  const fetchRoles = async () => {
+    try {
+      const response = await getRole({ page: 1, pageSize: 100 });
+      if (response && response.data && Array.isArray(response.data.roles)) {
+        setRoles(response.data.roles);
+      } else {
+        console.error('Unexpected API response structure for roles:', response);
+      }
+    } catch (error) {
+      console.error('Error fetching roles:', error);
+      message.error('Failed to fetch roles: ' + error.message);
+    }
+  };
+
   useEffect(() => {
     fetchUsers();
+    fetchRoles();
   }, []);
+
+  useEffect(() => {
+    console.log('Roles updated:', roles);
+  }, [roles]);
 
   const handleTableChange = (pagination) => {
     fetchUsers(pagination.current, pagination.pageSize, searchText);
@@ -59,7 +80,11 @@ const UserManagement = () => {
 
   const handleEdit = (record) => {
     setEditingUserId(record.id);
-    form.setFieldsValue(record);
+    form.setFieldsValue({
+      username: record.username,
+      status: record.status,
+      roleId: record.roleId
+    });
     setModalVisible(true);
   };
 
@@ -88,15 +113,26 @@ const UserManagement = () => {
     try {
       const values = await form.validateFields();
       if (editingUserId) {
-        await editUser({ ...values, id: editingUserId });
-        message.success('User updated successfully');
+        const response = await editUser({ ...values, id: editingUserId });
+        if (response && response.data && response.data.code === 200) {
+          message.success('User updated successfully');
+          setModalVisible(false);
+          fetchUsers(pagination.current, pagination.pageSize, searchText);
+        } else {
+          message.error('Failed to update user: ' + (response?.data?.message || 'Unknown error'));
+        }
       } else {
-        await addUser(values);
-        message.success('User added successfully');
+        const response = await addUser(values);
+        if (response && response.data && response.data.code === 200) {
+          message.success('User added successfully');
+          setModalVisible(false);
+          fetchUsers(pagination.current, pagination.pageSize, searchText);
+        } else {
+          message.error('Failed to add user: ' + (response?.data?.message || 'Unknown error'));
+        }
       }
-      setModalVisible(false);
-      fetchUsers(pagination.current, pagination.pageSize, searchText);
     } catch (error) {
+      console.error('Error saving user:', error);
       message.error('Validation failed: ' + error.message);
     }
   };
@@ -116,6 +152,15 @@ const UserManagement = () => {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
+    },
+    {
+      title: 'Role',
+      dataIndex: 'roleId',
+      key: 'roleId',
+      render: (roleId) => {
+        const role = roles.find(r => r.id === roleId);
+        return role ? role.name : 'N/A';
+      },
     },
     {
       title: 'Action',
@@ -160,6 +205,7 @@ const UserManagement = () => {
         rowKey="id"
         pagination={pagination}
         onChange={handleTableChange}
+        key={users.length}
       />
 
       <Modal
@@ -188,7 +234,21 @@ const UserManagement = () => {
             label="Status"
             rules={[{ required: true, message: 'Please select the status!' }]}
           >
-            <Input />
+            <Select>
+              <Option value="active">Active</Option>
+              <Option value="inactive">Inactive</Option>
+            </Select>
+          </Form.Item>
+          <Form.Item
+            name="roleId"
+            label="Role"
+            rules={[{ required: true, message: 'Please select a role!' }]}
+          >
+            <Select>
+              {roles.map(role => (
+                <Option key={role.id} value={role.id}>{role.name}</Option>
+              ))}
+            </Select>
           </Form.Item>
         </Form>
       </Modal>
