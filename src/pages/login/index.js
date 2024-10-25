@@ -1,7 +1,7 @@
 import React from 'react'
 import { Form, Input, Button, message } from 'antd';
 import "./login.css"
-import { getMenu } from '../../api/index'
+import { login } from '../../api/index'
 import { useNavigate, Navigate } from 'react-router-dom'
 
 const Login = () => {
@@ -9,17 +9,25 @@ const Login = () => {
   if (localStorage.getItem('token')) {
     return <Navigate to="/home" replace />
   }
-  const handleSubmit = (val) => {
-    if (!val.password || !val.username) {
-      return message.open({
-        type: 'warning',
-        content: '请输入用户名和密码',
-      });
+  const handleSubmit = async (values) => {
+    if (!values.password || !values.username) {
+      return message.warning('请输入用户名和密码');
     }
-    getMenu(val).then(({ data }) => {
-      localStorage.setItem('token', data.data.token)
-      navigate('/home')
-    })
+    try {
+      console.log('Attempting login with:', values);
+      const response = await login(values);
+      console.log('Login response:', response);
+      if (response.code === 200 && response.data && response.data.token) {
+        localStorage.setItem('token', response.data.token)
+        message.success('登录成功');
+        navigate('/home')
+      } else {
+        message.error('登录失败：' + (response.message || '未知错误'));
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      message.error('登录失败：' + (error.message || '未知错误'));
+    }
   }
   return (
     <Form
@@ -30,14 +38,16 @@ const Login = () => {
       <Form.Item
         label="账号"
         name="username"
+        rules={[{ required: true, message: '请输入账号' }]}
       >
         <Input placeholder="请输入账号" />
       </Form.Item>
       <Form.Item
         label="密码"
         name="password"
+        rules={[{ required: true, message: '请输入密码' }]}
       >
-        <Input.Password placeholder="请输入账号" />
+        <Input.Password placeholder="请输入密码" />
       </Form.Item>
       <Form.Item className="login-button">
         <Button type="primary" htmlType="submit">登录</Button>

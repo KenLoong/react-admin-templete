@@ -15,29 +15,29 @@ const routes = [
         children: [
             {
                 path: '/',
-                element: <Navigate to="home" replace /> //将/路由重定向至/home
+                element: <RouterAuth><Navigate to="/home" replace /></RouterAuth>
             },
             {
                 path: 'home',
-                Component: Home,
+                element: <RouterAuth><Home /></RouterAuth>,
             },
             {
                 path: 'users',
-                Component: UserManagement,
+                element: <RouterAuth><UserManagement /></RouterAuth>,
             },
             {
                 path: 'roles',
-                Component: RoleManagement,
+                element: <RouterAuth><RoleManagement /></RouterAuth>,
             },
             {
                 path: 'permissions',
-                Component: PermissionManagement,
+                element: <RouterAuth><PermissionManagement /></RouterAuth>,
             }
         ]
     },
     {
         path: '/login',
-        Component: Login
+        element: <Login />
     }
 ]
 

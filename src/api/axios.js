@@ -1,44 +1,37 @@
 import axios from 'axios'
 
-const baseUrl = '/api'
+const instance = axios.create({
+  baseURL: '/', // 改为 '/' 或空字符串 ''
+  timeout: 5000
+})
 
-class HttpRequest {
-  constructor(baseUrl) {
-    this.baseUrl = baseUrl
-  }
-
-  getInsideConfig() {
-    const config = {
-      baseUrl: this.baseUrl,
-      header: {}
+// 请求拦截器
+instance.interceptors.request.use(
+  config => {
+    const token = localStorage.getItem('token')
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`
     }
     return config
+  },
+  error => {
+    return Promise.reject(error)
   }
-  interceptors(instance) {
-    // 添加请求拦截器
-    instance.interceptors.request.use(function (config) {
-      // 在发送请求之前做些什么
-      return config;
-    }, function (error) {
-      // 对请求错误做些什么
-      return Promise.reject(error);
-    });
+)
 
-    // 添加响应拦截器
-    instance.interceptors.response.use(function (response) {
-      // 对响应数据做点什么
-      return response;
-    }, function (error) {
-      console.log(error, 'error')
-      // 对响应错误做点什么
-      return Promise.reject(error);
-    });
+// 响应拦截器
+instance.interceptors.response.use(
+  response => {
+    return response.data
+  },
+  error => {
+    if (error.response && error.response.status === 401) {
+      // token 过期或无效
+      localStorage.removeItem('token')
+      window.location.href = '/login'
+    }
+    return Promise.reject(error)
   }
-  request(options) {
-    const instance = axios.create()
-    options = { ...this.getInsideConfig(), ...options }
-    this.interceptors(instance)
-    return instance(options)
-  }
-}
-export default new HttpRequest(baseUrl)
+)
+
+export default instance
