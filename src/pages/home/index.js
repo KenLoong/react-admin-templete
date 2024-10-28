@@ -15,12 +15,7 @@ const Home = () => {
             <p className="access">超级管理员</p>
           </div>
         </div>
-        <div className="login-info">
-          <p>上次登录时间：<span>2021-7-19</span></p>
-          <p>上次登录地点：<span>武汉</span></p>
-        </div>
       </Card>
-      {/* 这里可以添加其他内容 */}
     </div>
   )
 }
