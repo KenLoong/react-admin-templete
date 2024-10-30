@@ -1,6 +1,7 @@
 import axios from 'axios'
 
 const instance = axios.create({
+  baseURL: 'http://127.0.0.1:5001',
   timeout: 5000
 })
 
@@ -26,7 +27,7 @@ instance.interceptors.request.use(
 instance.interceptors.response.use(
   response => {
     console.log('Axios response interceptor called', response);
-    return response
+    return response.data
   },
   error => {
     console.error('Axios response error:', error)

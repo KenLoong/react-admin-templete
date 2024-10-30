@@ -14,7 +14,7 @@ const Login = () => {
       console.log('Login attempt with values:', values);
       const response = await login(values.username, values.password);
       console.log('Login response:', response);
-      if (response.data && response.data.code === 200 && response.data.token) {
+      if (response && response.code == 200 && response.data.token) {
         localStorage.setItem('token', response.data.token);
         console.log('Token stored in localStorage:', response.data.token);
         message.success('登录成功');

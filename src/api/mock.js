@@ -48,11 +48,11 @@ const authMiddleware = () => {
 }
 
 // 模拟登录接口
-Mock.mock('/login', 'post', (options) => {
-    console.log('Mock login called with options:', options);
-    const { username, password } = JSON.parse(options.body);
-    return userApi.login(username, password);
-})
+//Mock.mock('/login', 'post', (options) => {
+//    console.log('Mock login called with options:', options);
+//    const { username, password } = JSON.parse(options.body);
+//    return userApi.login(username, password);
+//})
 
 // 首页相关
 Mock.mock('/home/getData', 'get', () => {
