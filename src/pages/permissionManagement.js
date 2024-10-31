@@ -59,7 +59,7 @@ const PermissionManagement = () => {
         message.success('Permission deleted successfully');
         fetchPermissions(pagination.current, pagination.pageSize, searchText, filters);
       } else {
-        message.error('Failed to delete permission: ' + (response.data?.message || 'Unknown error'));
+        message.error('Failed to delete permission: ' + (response.message || 'Unknown error'));
       }
     } catch (error) {
       console.error('Error deleting permission:', error);
