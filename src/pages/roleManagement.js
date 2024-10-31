@@ -74,7 +74,7 @@ const RoleManagement = () => {
         message.success('Role deleted successfully');
         fetchRoles(pagination.current, pagination.pageSize, searchText);
       } else {
-        message.error('Failed to delete role: ' + (response.data?.message || 'Unknown error'));
+        message.error('Failed to delete role: ' + (response.message || 'Unknown error'));
       }
     } catch (error) {
       console.error('Error deleting role:', error);
