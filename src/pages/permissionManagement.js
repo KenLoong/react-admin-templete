@@ -55,7 +55,7 @@ const PermissionManagement = () => {
   const handleDelete = async (id) => {
     try {
       const response = await deletePermission({ id });
-      if (response.data && response.data.code === 200) {
+      if (response.code === 200) {
         message.success('Permission deleted successfully');
         fetchPermissions(pagination.current, pagination.pageSize, searchText, filters);
       } else {
@@ -88,7 +88,7 @@ const PermissionManagement = () => {
       } else {
         response = await addPermission(values);
       }
-      if (response.data && response.data.code === 200) {
+      if (response.data && response.code === 200) {
         message.success(editingPermission ? 'Permission updated successfully' : 'Permission added successfully');
         setModalVisible(false);
         fetchPermissions(pagination.current, pagination.pageSize, searchText, filters);

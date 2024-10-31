@@ -132,6 +132,7 @@ Mock.mock('/permissions/list', 'post', (options) => {
 })
 */
 
+/*
 Mock.mock('/permissions/add', 'post', (options) => {
     const authResult = authMiddleware()
     if (authResult) return authResult
@@ -149,12 +150,14 @@ Mock.mock('/permissions/delete', 'post', (options) => {
     if (authResult) return authResult
     return permissionApi.deletePermission(JSON.parse(options.body))
 })
-
+*/
 // 菜单相关
+/*
 Mock.mock('/permission/getMenu', 'post', (options) => {
     const authResult = authMiddleware()
     if (authResult) return authResult
     return permissionApi.getMenu(JSON.parse(options.body))
 })
+*/
 
 export default Mock

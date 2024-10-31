@@ -70,7 +70,7 @@ const RoleManagement = () => {
   const handleDelete = async (id) => {
     try {
       const response = await deleteRole({ id });
-      if (response.data && response.data.code === 200) {
+      if (response.code === 200) {
         message.success('Role deleted successfully');
         fetchRoles(pagination.current, pagination.pageSize, searchText);
       } else {
@@ -117,7 +117,7 @@ const RoleManagement = () => {
           permissions: selectedPermissions.map(p => ({ id: p.id, name: p.name }))
         });
       }
-      if (response.data && response.data.code === 200) {
+      if (response.data && response.code === 200) {
         message.success(editingRole ? 'Role updated successfully' : 'Role added successfully');
         setModalVisible(false);
         form.resetFields();

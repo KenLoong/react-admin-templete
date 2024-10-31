@@ -105,7 +105,7 @@ const UserManagement = () => {
       console.log('Deleting user with id:', id);
       const response = await deleteUser({ id });  // 传递一个对象，而不是直接传递 id
       console.log('Delete response:', response);
-      if (response.data && response.data.code === 200) {
+      if (response.code === 200) {
         message.success('User deleted successfully');
         fetchUsers(pagination.current, pagination.pageSize, searchText);
       } else {
