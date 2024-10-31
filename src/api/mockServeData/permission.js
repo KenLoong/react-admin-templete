@@ -175,7 +175,7 @@ export default {
   },
 
   // 获取菜单
-  getMenu: body => {
+  /*getMenu: body => {
     console.log('Mock getMenu called with body:', body);
     // 这里可以根据需要实现获取菜单的逻辑
     // 例如，可以返回所有类型为 'menu' 的权限
@@ -184,5 +184,5 @@ export default {
       code: 200,
       data: menuList
     };
-  }
+  }*/
 };

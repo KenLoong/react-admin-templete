@@ -20,13 +20,13 @@ const RoleManagement = () => {
     try {
       const response = await getRole({ page, pageSize, name });
       console.log('getRole response:', response);
-      if (response.data && response.data.code === 200 && Array.isArray(response.data.roles)) {
-        setRoles(response.data.roles);
+      if (response.data && response.code === 200 && Array.isArray(response.data.list)) {
+        setRoles(response.data.list);
         setPagination({
           ...pagination,
           current: page,
           pageSize: pageSize,
-          total: response.data.total || response.data.roles.length
+          total: response.data.pagination.total
         });
       } else {
         console.error('Unexpected API response structure:', response);
@@ -42,8 +42,8 @@ const RoleManagement = () => {
   const fetchPermissions = async () => {
     try {
       const response = await getPermission({ page: 1, pageSize: 1000 });
-      if (response.data && response.data.code === 200 && Array.isArray(response.data.permissions)) {
-        setPermissions(response.data.permissions);
+      if (response.data && response.code === 200 && Array.isArray(response.data.list)) {
+        setPermissions(response.data.list);
       } else {
         console.error('Unexpected API response structure for permissions:', response);
       }

@@ -62,14 +62,16 @@ Mock.mock('/home/getData', 'get', () => {
 })
 
 // 用户管理相关
+/*
 Mock.mock('/users/list', 'post', (options) => {
     console.log('Mock /users/list called with options:', options);
     const authResult = authMiddleware()
     if (authResult) return authResult
     return userApi.getUser(JSON.parse(options.body))
 })
+*/
 
-Mock.mock('/users/add', 'post', (options) => {
+/*Mock.mock('/users/add', 'post', (options) => {
     console.log('Mock /users/add called with options:', options);
     const authResult = authMiddleware()
     if (authResult) return authResult
@@ -88,15 +90,20 @@ Mock.mock('/users/delete', 'post', (options) => {
     if (authResult) return authResult
     return userApi.deleteUser(options)  // 直接传递 options，而不是尝试解析 body
 })
+*/
 
 // 角色管理相关
+/*
 Mock.mock('/roles/list', 'post', (options) => {
     console.log('Mock /roles/list called with options:', options);
     const authResult = authMiddleware()
     if (authResult) return authResult
     return roleApi.getRole(JSON.parse(options.body))
 })
+*/
+ 
 
+/*
 Mock.mock('/roles/add', 'post', (options) => {
     const authResult = authMiddleware()
     if (authResult) return authResult
@@ -114,13 +121,16 @@ Mock.mock('/roles/delete', 'post', (options) => {
     if (authResult) return authResult
     return roleApi.deleteRole(JSON.parse(options.body))
 })
+*/
 
 // 权限管理相关
+/*
 Mock.mock('/permissions/list', 'post', (options) => {
     const authResult = authMiddleware()
     if (authResult) return authResult
     return permissionApi.getPermission(JSON.parse(options.body))
 })
+*/
 
 Mock.mock('/permissions/add', 'post', (options) => {
     const authResult = authMiddleware()

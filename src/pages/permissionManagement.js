@@ -19,13 +19,13 @@ const PermissionManagement = () => {
     setLoading(true);
     try {
       const response = await getPermission({ page, pageSize, name, ...filters });
-      if (response.data && response.data.code === 200 && Array.isArray(response.data.permissions)) {
-        setPermissions(response.data.permissions);
+      if (response.data && response.code === 200 && Array.isArray(response.data.list)) {
+        setPermissions(response.data.list);
         setPagination(prev => ({
           ...prev,
           current: page,
           pageSize: pageSize,
-          total: response.data.total || response.data.permissions.length
+          total: response.data.pagination.total 
         }));
       } else {
         console.error('Unexpected API response structure:', response);

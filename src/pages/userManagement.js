@@ -22,7 +22,7 @@ const UserManagement = () => {
     try {
       const response = await getUser({ page, pageSize, username });
       console.log('getUser response:', response);
-      if (response.data && response.data.code === 200) {
+      if ( response.code === 200 && response.data) {
         setUsers(response.data.list);
         setPagination(prev => ({
           ...prev,
@@ -45,9 +45,9 @@ const UserManagement = () => {
     try {
       const response = await getRole({ page: 1, pageSize: 100 });
       console.log('Roles API response:', response);
-      if (response.data && response.data.code === 200 && Array.isArray(response.data.roles)) {
-        setRoles(response.data.roles);
-        console.log('Roles set:', response.data.roles);
+      if (response.data && response.code === 200 && Array.isArray(response.data.list)) {
+        setRoles(response.data.list);
+        console.log('Roles set:', response.data.list);
       } else {
         console.error('Unexpected API response structure for roles:', response);
         message.error('获取角色列表失败：意外的响应结构');
@@ -90,6 +90,7 @@ const UserManagement = () => {
 
   const handleEdit = (record) => {
     setEditingUserId(record.id);
+    // todo:user需要返回roleId
     form.setFieldsValue({
       username: record.username,
       status: record.status,
@@ -131,7 +132,7 @@ const UserManagement = () => {
       } else {
         response = await addUser(values);
       }
-      if (response.data && response.data.code === 200) {
+      if (response.data && response.code === 200) {
         message.success(editingUserId ? 'User updated successfully' : 'User added successfully');
         setModalVisible(false);
         form.resetFields();
