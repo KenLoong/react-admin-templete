@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Space, Button, Input, Modal, Form, message, Popconfirm, Select } from 'antd';
+import { Table, Space, Button, Input, Modal, Form, message, Popconfirm, Select, Tag } from 'antd';
 import { getUser, addUser, editUser, deleteUser, getRole } from '../api';
 
 const { Search } = Input;
@@ -22,7 +22,7 @@ const UserManagement = () => {
     try {
       const response = await getUser({ page, pageSize, username });
       console.log('getUser response:', response);
-      if ( response.code === 200 && response.data) {
+      if (response.code === 200 && response.data) {
         setUsers(response.data.list);
         setPagination(prev => ({
           ...prev,
@@ -82,7 +82,6 @@ const UserManagement = () => {
   };
 
   const handleAdd = () => {
-    
     setEditingUserId(null);
     form.resetFields();
     setModalVisible(true);
@@ -90,11 +89,10 @@ const UserManagement = () => {
 
   const handleEdit = (record) => {
     setEditingUserId(record.id);
-    // todo:user需要返回roleId
     form.setFieldsValue({
       username: record.username,
       status: record.status,
-      roleId: record.roleId
+      roleIds: record.roles ? record.roles.map(role => role.id) : []
     });
     setModalVisible(true);
   };
@@ -103,7 +101,7 @@ const UserManagement = () => {
     try {
       setDeletingId(id);
       console.log('Deleting user with id:', id);
-      const response = await deleteUser({ id });  // 传递一个对象，而不是直接传递 id
+      const response = await deleteUser({ id });
       console.log('Delete response:', response);
       if (response.code === 200) {
         message.success('User deleted successfully');
@@ -123,14 +121,18 @@ const UserManagement = () => {
   const handleModalOk = async () => {
     try {
       const values = await form.validateFields();
+      const payload = {
+        ...values,
+        roles: values.roleIds.map(roleId => ({ id: roleId }))
+      };
       let response;
       if (editingUserId) {
         response = await editUser({ 
           id: editingUserId,
-          ...values
+          ...payload
         });
       } else {
-        response = await addUser(values);
+        response = await addUser(payload);
       }
       if (response.data && response.code === 200) {
         message.success(editingUserId ? 'User updated successfully' : 'User added successfully');
@@ -163,13 +165,18 @@ const UserManagement = () => {
       key: 'status',
     },
     {
-      title: 'Role',
-      dataIndex: 'roleId',
-      key: 'roleId',
-      render: (roleId) => {
-        const role = roles.find(r => r.id === roleId);
-        return role ? role.name : 'N/A';
-      },
+      title: 'Roles',
+      dataIndex: 'roles',
+      key: 'roles',
+      render: (roles) => (
+        <>
+          {roles && roles.map(role => (
+            <Tag color="blue" key={role.id}>
+              {`${role.name} (${role.id})`}
+            </Tag>
+          ))}
+        </>
+      ),
     },
     {
       title: 'Action',
@@ -191,9 +198,6 @@ const UserManagement = () => {
     },
   ];
 
-  // 在这里添加 console.log
-  console.log('Current users:', users);
-
   return (
     <div>
       <h1>User Management</h1>
@@ -214,7 +218,6 @@ const UserManagement = () => {
         rowKey="id"
         pagination={pagination}
         onChange={handleTableChange}
-        key={users.length}
       />
 
       <Modal
@@ -249,11 +252,11 @@ const UserManagement = () => {
             </Select>
           </Form.Item>
           <Form.Item
-            name="roleId"
-            label="Role"
-            rules={[{ required: true, message: 'Please select a role!' }]}
+            name="roleIds"
+            label="Roles"
+            rules={[{ required: true, message: 'Please select at least one role!' }]}
           >
-            <Select>
+            <Select mode="multiple" placeholder="Select roles">
               {roles.map(role => (
                 <Option key={role.id} value={role.id}>{role.name}</Option>
               ))}
