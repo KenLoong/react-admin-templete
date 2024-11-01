@@ -42,8 +42,10 @@ const RoleManagement = () => {
   const fetchPermissions = async () => {
     try {
       const response = await getPermission({ page: 1, pageSize: 1000 });
+      console.log('Permissions API response:', response);
       if (response.data && response.code === 200 && Array.isArray(response.data.list)) {
         setPermissions(response.data.list);
+        console.log('Permissions set:', response.data.list);
       } else {
         console.error('Unexpected API response structure for permissions:', response);
       }
@@ -83,6 +85,7 @@ const RoleManagement = () => {
   };
 
   const handleEdit = (record) => {
+    fetchPermissions();
     setEditingRole(record);
     form.setFieldsValue({
       name: record.name,
@@ -93,6 +96,7 @@ const RoleManagement = () => {
   };
 
   const handleAdd = () => {
+    fetchPermissions();
     setEditingRole(null);
     form.resetFields();
     setModalVisible(true);
@@ -225,9 +229,14 @@ const RoleManagement = () => {
             rules={[{ required: true, message: 'Please select at least one permission!' }]}
           >
             <Select mode="multiple" placeholder="Select permissions">
-              {permissions.map(permission => (
-                <Option key={permission.id} value={permission.id}>{`${permission.name} (${permission.id})`}</Option>
-              ))}
+              {permissions.map(permission => {
+                console.log('Rendering permission:', permission);
+                return (
+                  <Option key={permission.id} value={permission.id}>
+                    {`${permission.name} (${permission.id})`}
+                  </Option>
+                );
+              })}
             </Select>
           </Form.Item>
         </Form>
