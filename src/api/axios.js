@@ -5,7 +5,7 @@ const instance = axios.create({
   timeout: 5000
 })
 
-// 请求拦截器
+// Request interceptor
 instance.interceptors.request.use(
   config => {
     console.log('Axios request interceptor called', config);
@@ -23,15 +23,20 @@ instance.interceptors.request.use(
   }
 )
 
-// 响应拦截器
+// Response interceptor
 instance.interceptors.response.use(
   response => {
     console.log('Axios response interceptor called', response);
-    return response.data
+    // Check if response.data is empty
+    if (response.data !== null && response.data !== undefined) {
+      return response.data;
+    } else {
+      return response;
+    }
   },
   error => {
-    console.error('Axios response error:', error)
-    return Promise.reject(error)
+    console.error('Axios response error:', error);
+    return Promise.reject(error);
   }
 )
 

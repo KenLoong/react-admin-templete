@@ -111,17 +111,19 @@ const UserManagement = () => {
       } else {
         response = await addUser(payload);
       }
-      if (response.data && response.code === 200) {
+      console.log('edit/add user response:', response);
+      if (response.code === 200) {
         message.success(editingUserId ? 'User updated successfully' : 'User added successfully');
         setModalVisible(false);
         form.resetFields();
         fetchUsers(pagination.current, pagination.pageSize, searchText);
       } else {
-        message.error('Failed to save user: ' + (response.data?.message || 'Unknown error'));
+        message.error('Failed to save user: ' + (response.message || 'Unknown error'));
       }
     } catch (error) {
       console.error('Error saving user:', error);
-      message.error('Failed to save user: ' + error.message);
+      message.error('Error saving user: ' + (error.response?.data?.message || error.response?.data?.msg || 'Unknown error'));
+
     }
   };
 
