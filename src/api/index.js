@@ -19,6 +19,11 @@ export const editUser = (params) => {
   });
 }
 
+export const changePassword = (currentPassword, newPassword) => {
+  console.log('Calling changePassword API with:', { currentPassword, newPassword });
+  return axios.post('/users/change-password', { currentPassword, newPassword });
+}
+
 export const deleteUser = (data) => {
   return axios.post('/users/delete', data);
 }
