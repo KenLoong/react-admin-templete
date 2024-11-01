@@ -16,6 +16,7 @@ const Login = () => {
       console.log('Login response:', response);
       if (response && response.code == 200 && response.data.token) {
         localStorage.setItem('token', response.data.token);
+        localStorage.setItem('user_info', JSON.stringify(response.data.user));
         console.log('Token stored in localStorage:', response.data.token);
         message.success('登录成功');
         navigate('/home');

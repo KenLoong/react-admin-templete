@@ -17,29 +17,34 @@ const CommonAside = ({ collapsed }) => {
 
   useEffect(() => {
     console.log('CommonAside useEffect triggered');
-    const userString = localStorage.getItem('user');
+    const userString = localStorage.getItem('user_info');
     console.log('User string from localStorage:', userString);
     if (userString) {
       const user = JSON.parse(userString);
       console.log('Parsed user data:', user);
 
-      if (user && user.role && user.role.permissions) {
-        const menuData = user.role.permissions
+      if (user && user.permissions) {
+        const menuData = user.permissions
           .filter(permission => permission.type === 'menu')
           .map(permission => ({
             key: permission.url,
             icon: iconToElement(permission.icon || 'AppstoreOutlined'),
             label: permission.name,
+            children: permission.children ? permission.children.map(child => ({
+              key: child.url,
+              icon: iconToElement(child.icon || 'AppstoreOutlined'),
+              label: child.name,
+            })) : []
           }));
         
-        // 如果菜单中没有 Home 项，则添加一个
-        if (!menuData.some(item => item.key === '/home')) {
-          menuData.unshift({
-            key: '/home',
-            icon: iconToElement('HomeOutlined'),
-            label: 'Home',
-          });
-        }
+
+        // if (!menuData.some(item => item.key === '/home')) {
+        //   menuData.unshift({
+        //     key: '/home',
+        //     icon: iconToElement('HomeOutlined'),
+        //     label: 'Home',
+        //   });
+        // }
         
         console.log('Generated menu data:', menuData);
         setMenuItems(menuData);
@@ -79,7 +84,7 @@ const CommonAside = ({ collapsed }) => {
 
   return (
     <Sider width={200} collapsed={collapsed}>
-      <h3 className="app-name">{collapsed ? '后台' : '通用后台管理系统'}</h3>
+      <h3 className="app-name">{collapsed ? 'Admin' : 'General Admin System'}</h3>
       <Menu
         mode="inline"
         theme="dark"

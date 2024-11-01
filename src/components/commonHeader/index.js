@@ -6,7 +6,7 @@ import { useDispatch } from "react-redux";
 import { collapseMenu } from '../../store/reducers/tab'
 import { useNavigate } from 'react-router-dom'
 import { changePassword, deleteUser } from '../../api';
-import { jwtDecode } from 'jwt-decode'; // 导入 jwt-decode
+import { jwtDecode } from 'jwt-decode'; 
 
 const { Header } = Layout
 
@@ -21,7 +21,6 @@ const CommonHeader = ({ collapsed }) => {
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
 
-    // 获取用户 ID
     const getUserIdFromToken = () => {
         const token = localStorage.getItem('token');
         if (!token) {
@@ -67,6 +66,7 @@ const CommonHeader = ({ collapsed }) => {
     // Logout
     const logout = () => {
         localStorage.removeItem('token')
+        localStorage.removeItem('user_info')
         navigate('/login')
     }
 
@@ -96,17 +96,16 @@ const CommonHeader = ({ collapsed }) => {
     const handlePasswordChange = async () => {
         try {
             const response = await changePassword(currentPassword, newPassword);
-            if (response.data.code === 200) {
+            if (response.code === 200) {
                 message.success('Password changed successfully');
                 setIsModalVisible(false);
                 setCurrentPassword('');
                 setNewPassword('');
             } else {
-                message.error(response.data.message || 'Failed to change password');
+                message.error(response.message || 'Failed to change password');
             }
         } catch (error) {
             console.error('Error changing password:', error);
-            message.error('An error occurred while changing password');
         }
     }
 
