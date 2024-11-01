@@ -24,8 +24,8 @@ export const changePassword = (currentPassword, newPassword) => {
   return axios.post('/users/change-password', { currentPassword, newPassword });
 }
 
-export const deleteUser = (data) => {
-  return axios.post('/users/delete', data);
+export const deleteUser = (id) => {
+  return axios.post('/users/delete', {id});
 }
 
 // 角色管理相关的 API

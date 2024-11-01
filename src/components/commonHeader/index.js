@@ -5,7 +5,8 @@ import './index.css'
 import { useDispatch } from "react-redux";
 import { collapseMenu } from '../../store/reducers/tab'
 import { useNavigate } from 'react-router-dom'
-import { changePassword } from '../../api'; 
+import { changePassword, deleteUser } from '../../api';
+import { jwtDecode } from 'jwt-decode'; // 导入 jwt-decode
 
 const { Header } = Layout
 
@@ -19,6 +20,21 @@ const CommonHeader = ({ collapsed }) => {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
+
+    // 获取用户 ID
+    const getUserIdFromToken = () => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            return null;
+        }
+        try {
+            const decoded = jwtDecode(token);
+            return decoded.sub || decoded.user_id || decoded.id; // 根据你的 JWT 结构调整
+        } catch (error) {
+            console.error('Failed to decode token:', error);
+            return null;
+        }
+    }
 
     // Dropdown menu options
     const items = [
@@ -55,23 +71,38 @@ const CommonHeader = ({ collapsed }) => {
     }
 
     // Delete account
-    const deleteAccount = () => {
-        console.log('Deleting account...')
-        localStorage.removeItem('token')
-        navigate('/login')
+    const deleteAccount = async () => {
+        try {
+            const userId = getUserIdFromToken();
+            if (!userId) {
+                message.error('Failed to retrieve user ID');
+                return;
+            }
+            const response = await deleteUser(userId);
+            if (response.code === 200) {
+                message.success('Account deleted successfully');
+                localStorage.removeItem('token');
+                navigate('/login');
+            } else {
+                message.error(response.data.message || 'Failed to delete account');
+            }
+        } catch (error) {
+            console.error('Error deleting account:', error);
+            message.error('An error occurred while deleting account');
+        }
     }
 
     // Handle password change
     const handlePasswordChange = async () => {
         try {
             const response = await changePassword(currentPassword, newPassword);
-            if (response.code === 200) {
+            if (response.data.code === 200) {
                 message.success('Password changed successfully');
                 setIsModalVisible(false);
                 setCurrentPassword('');
                 setNewPassword('');
             } else {
-                message.error(response.message || 'Failed to change password');
+                message.error(response.data.message || 'Failed to change password');
             }
         } catch (error) {
             console.error('Error changing password:', error);
