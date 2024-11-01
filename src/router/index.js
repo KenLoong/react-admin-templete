@@ -15,7 +15,7 @@ const routes = [
         children: [
             {
                 path: '/',
-                element: <RouterAuth><Navigate to="/home" replace /></RouterAuth>
+                element: <RouterAuth><Navigate to="/login" replace /></RouterAuth>
             },
             {
                 path: 'home',

@@ -21,7 +21,7 @@ const Login = () => {
         navigate('/home');
       } else {
         console.error('Unexpected login response:', response);
-        message.error(response.data?.message || '登录失败');
+        message.error(response.message || '登录失败');
       }
     } catch (error) {
       console.error('Login error:', error);
