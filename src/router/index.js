@@ -4,6 +4,7 @@ import Home from '../pages/home'
 import UserManagement from '../pages/userManagement'
 import RoleManagement from '../pages/roleManagement'
 import PermissionManagement from '../pages/permissionManagement'
+import AuditLogManagement from '../pages/auditLogManagement'
 import Login from '../pages/login'
 import { RouterAuth } from './routerAuth'
 
@@ -32,6 +33,10 @@ const routes = [
             {
                 path: 'permissions',
                 element: <RouterAuth><PermissionManagement /></RouterAuth>,
+            },
+            {
+                path: 'audit-logs', 
+                element: <RouterAuth><AuditLogManagement /></RouterAuth>,
             }
         ]
     },

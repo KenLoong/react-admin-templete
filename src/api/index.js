@@ -1,6 +1,6 @@
 import axios from './axios'
 
-// 用户管理相关的 API
+// User management related APIs
 export const getUser = (params) => {
   console.log('Calling getUser API with params:', params);
   return axios.post('/users/list', params);
@@ -28,7 +28,7 @@ export const deleteUser = (id) => {
   return axios.post('/users/delete', {id});
 }
 
-// 角色管理相关的 API
+// Role management related APIs
 export const getRole = (params) => {
   return axios.post('/roles/list', params);
 }
@@ -45,7 +45,7 @@ export const deleteRole = (params) => {
   return axios.post('/roles/delete', params);
 }
 
-// 权限管理相关的 API
+// Permission management related APIs
 export const getPermission = (params) => {
   return axios.post('/permissions/list', params);
 }
@@ -62,17 +62,23 @@ export const deletePermission = (params) => {
   return axios.post('/permissions/delete', params);
 }
 
-// 登录 API
+// Login API
 export const login = (username, password) => {
   console.log('Calling login API with:', { username, password });
   return axios.post('/login', { username, password });
 }
 
-// 从 old-index.js 合并的 API
+// APIs merged from old-index.js
 export const getMenu = (param) => {
   return axios.post('/permission/getMenu', param);
 }
 
 export const getData = () => {
   return axios.get('/home/getData');
+}
+
+// Audit log related API
+export const getAuditLogs = (params) => {
+  console.log('Calling getAuditLogs API with params:', params);
+  return axios.post('/audit-logs/list', params);
 }
