@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Space, Button, Input, Modal, Form, message, Popconfirm, Select, Tag } from 'antd';
-import { getUser, addUser, editUser, deleteUser, getRole } from '../api';
+import { Table, Space, Button, Input, Modal, Form, message, Select, Tag } from 'antd';
+import { getUser, addUser, editUser, getRole } from '../api';
 
 const { Search } = Input;
 const { Option } = Select;
@@ -14,7 +14,6 @@ const UserManagement = () => {
   const [editingUserId, setEditingUserId] = useState(null);
   const [pagination, setPagination] = useState({ current: 1, pageSize: 10, total: 0 });
   const [searchText, setSearchText] = useState('');
-  const [deletingId, setDeletingId] = useState(null);
 
   const fetchUsers = async (page = 1, pageSize = 10, username = '') => {
     console.log('Fetching users with:', { page, pageSize, username });
@@ -96,27 +95,6 @@ const UserManagement = () => {
     setModalVisible(true);
   };
 
-  const handleDelete = async (id) => {
-    try {
-      setDeletingId(id);
-      console.log('Deleting user with id:', id);
-      const response = await deleteUser({ id });
-      console.log('Delete response:', response);
-      if (response.code === 200) {
-        message.success('User deleted successfully');
-        fetchUsers(pagination.current, pagination.pageSize, searchText);
-      } else {
-        console.error('Unexpected delete response:', response);
-        message.error('Failed to delete user: ' + (response.data?.message || 'Unknown error'));
-      }
-    } catch (error) {
-      console.error('Error deleting user:', error);
-      message.error('Failed to delete user: ' + error.message);
-    } finally {
-      setDeletingId(null);
-    }
-  };
-
   const handleModalOk = async () => {
     try {
       const values = await form.validateFields();
@@ -178,15 +156,6 @@ const UserManagement = () => {
       render: (_, record) => (
         <Space size="middle">
           <Button onClick={() => handleEdit(record)}>Edit</Button>
-          <Popconfirm
-            title="Are you sure to delete this user?"
-            onConfirm={() => handleDelete(record.id)}
-            okText="Yes"
-            cancelText="No"
-            okButtonProps={{ loading: deletingId === record.id }}
-          >
-            <Button danger loading={deletingId === record.id}>Delete</Button>
-          </Popconfirm>
         </Space>
       ),
     },
@@ -228,13 +197,15 @@ const UserManagement = () => {
           >
             <Input />
           </Form.Item>
-          <Form.Item
-            name="password"
-            label="Password"
-            rules={[{ required: !editingUserId, message: 'Please input the password!' }]}
-          >
-            <Input.Password />
-          </Form.Item>
+          {!editingUserId && (
+            <Form.Item
+              name="password"
+              label="Password"
+              rules={[{ required: true, message: 'Please input the password!' }]}
+            >
+              <Input.Password />
+            </Form.Item>
+          )}
           <Form.Item
             name="roleIds"
             label="Roles"
