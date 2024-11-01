@@ -91,7 +91,6 @@ const UserManagement = () => {
     setEditingUserId(record.id);
     form.setFieldsValue({
       username: record.username,
-      status: record.status,
       roleIds: record.roles ? record.roles.map(role => role.id) : []
     });
     setModalVisible(true);
@@ -158,11 +157,6 @@ const UserManagement = () => {
       title: 'Username',
       dataIndex: 'username',
       key: 'username',
-    },
-    {
-      title: 'Status',
-      dataIndex: 'status',
-      key: 'status',
     },
     {
       title: 'Roles',
@@ -240,16 +234,6 @@ const UserManagement = () => {
             rules={[{ required: !editingUserId, message: 'Please input the password!' }]}
           >
             <Input.Password />
-          </Form.Item>
-          <Form.Item
-            name="status"
-            label="Status"
-            rules={[{ required: true, message: 'Please select the status!' }]}
-          >
-            <Select>
-              <Option value="active">Active</Option>
-              <Option value="inactive">Inactive</Option>
-            </Select>
           </Form.Item>
           <Form.Item
             name="roleIds"
