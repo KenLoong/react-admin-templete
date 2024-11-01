@@ -84,11 +84,11 @@ const CommonHeader = ({ collapsed }) => {
                 localStorage.removeItem('token');
                 navigate('/login');
             } else {
-                message.error(response.data.message || 'Failed to delete account');
+                message.error(response.message || 'Failed to delete account');
             }
         } catch (error) {
             console.error('Error deleting account:', error);
-            message.error('An error occurred while deleting account');
+            message.error('An error occurred while deleting account: ' + error?.response?.data?.message || error.response?.data?.msg || 'Unknown error');
         }
     }
 
